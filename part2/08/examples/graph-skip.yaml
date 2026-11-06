@@ -1,0 +1,13 @@
+start: write
+
+steps:
+  write:
+    claude: prompt.md
+    args: ["--allowedTools", "Read", "--disallowedTools", "Bash"]
+    needs: [memo.md]
+    output: draft.md
+    next: check
+  check:
+    run: python check.py draft.md
+    next: end
+    on_reject: end

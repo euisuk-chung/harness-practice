@@ -1,0 +1,16 @@
+start: sent
+
+steps:
+  sent:
+    run: python fixtures/already-sent.py
+    next: write
+  write:
+    claude: prompt.md
+    args: ["--allowedTools", "Read", "--disallowedTools", "Bash"]
+    needs: [memo.md]
+    output: draft.md
+    next: check
+  check:
+    run: python check.py draft.md
+    next: end
+    on_reject: write

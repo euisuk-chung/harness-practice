@@ -1,0 +1,8 @@
+{
+  "type": "result",
+  "subtype": "success",
+  "is_error": true,
+  "num_turns": 1,
+  "result": "일시적인 호출 실패를 흉내 낸 응답입니다",
+  "permission_denials": []
+}
