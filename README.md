@@ -11,6 +11,7 @@
 | `part2/08` | `graph.yaml` 을 읽어 단계를 차례로 실행하는 `runner.py` 와 환불 요청 문자를 검사하는 `check.py` 입니다. 거부되면 이유를 붙여 다시 쓰고, `max_attempts` 를 넘기거나 입력·권한이 막히면 `human_queue/` 에 남기고 exit code 3 으로 끝납니다. 단계가 exit code 4(할 일 없음)로 끝나면 남은 단계를 건너뛰고 exit code 0 으로 끝납니다. 멈췄다 다시 실행하면 `state.json` 에서 이어 갑니다. `--answer fixtures/…` 로 Claude 를 부르지 않고 시험할 수 있습니다. |
 | `project1/09` | 프로젝트 1 블로그의 시작 저장소입니다. `project1` 아래 번호 폴더마다 그 차시 시작 상태 전체가 들어 있습니다. 이 폴더를 복사해 내 GitHub 계정의 새 저장소로 올리고 GitHub Pages 로 빈 블로그를 엽니다. `make_site.py` 가 `posts/` 의 글로 `docs/` 를 만들고, `examples/` 에 계획서 `PLAN.md`·graph 초안·`CLAUDE.md` 가 있습니다. 자세한 것은 그 폴더의 `README.md` 에 있습니다. |
 | `project1/10` | 블로그에 수집 · 작성 단계를 더한 상태입니다. `prompts/` 의 수집 · 작성 프롬프트, 수집 결과를 세는 `steps/count.py`, 수집 단계만 `runs/<날짜>/sources/` 에 쓰게 하는 hook(`.claude/hooks/protect.py`), Claude 를 부르지 않고 시험하는 `fixtures/` 가 들어 있습니다. 이미 `~/my-blog` 가 있으면 더해지거나 바뀐 것만 복사합니다. 자세한 것은 그 폴더의 `README.md` 에 있습니다. |
+| `project1/11` | 블로그에 검사 · 승인 단계를 더한 상태입니다. 초안을 다섯 가지로 검사하는 `steps/check.py`, 통과한 초안으로 PR 을 여는 `steps/approve.py`, 작성 → 검사만 있는 연습 graph(`examples/graph-retry.yaml`), 검사마다 거부되는 초안이 든 `fixtures/check/` 가 들어 있습니다. 이미 `~/my-blog` 가 있으면 더해지거나 바뀐 것만 복사합니다. 자세한 것은 그 폴더의 `README.md` 에 있습니다. |
 
 ## 받기와 실행
 
