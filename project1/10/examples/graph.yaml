@@ -1,0 +1,25 @@
+# 프로젝트 1 graph — 매일 아침 AI 기업 소식 블로그
+# 이번 판은 수집 → 세기 → 작성까지 실행하고, 초안이 준비되면 멈춘다. 검사(check)와 승인(approve)은 아직 없다.
+# ① 매일 아침 저절로 · 같은 날 두 번 X → graph 밖에서 GitHub Actions 가 runner 를 부른다
+
+start: collect
+max_attempts: 3              # ④ 다시 쓰되 세 번까지 — 넘으면 human queue
+backoff_seconds: 2
+retry_prompt: "앞 결과가 거부된 이유: {reason}. 이 이유만 고치세요."
+
+steps:
+  collect:                   # ② 웹서치로 새 글을 찾고 원문 · 주소 · 게시일 · 가져온 날짜를 남긴다
+    claude: prompts/collect.md
+    args: ["--allowedTools", "WebSearch,WebFetch(domain:blog.google),WebFetch(domain:www.anthropic.com),WebFetch(domain:openai.com),Write,Edit"]
+    output: sources.json
+    next: count
+  count:                     # ⑥ 새 글 0건 → exit code 4 로 끝 · 수집 실패 → 거부해 collect 다시
+    run: python steps/count.py sources.json
+    next: write
+    on_reject: collect
+  write:                     # ⑦ CLAUDE.md 의 독자 · 말투로 초안을 쓴다 — 웹에는 나가지 않는다
+    claude: prompts/write.md
+    args: ["--disallowedTools", "WebSearch,WebFetch,Bash"]
+    needs: [sources.json]
+    output: draft.md
+    next: end                # 초안 준비됨에서 멈춘다
