@@ -1,0 +1,12 @@
+{
+  "01.md": {"pass": true, "kind": "정상"},
+  "02.md": {"pass": true, "kind": "정상"},
+  "03.md": {"pass": true, "kind": "정상"},
+  "04.md": {"pass": false, "kind": "형식 어김"},
+  "05.md": {"pass": false, "kind": "형식 어김"},
+  "06.md": {"pass": false, "kind": "틀린 내용"},
+  "07.md": {"pass": false, "kind": "틀린 내용"},
+  "08.md": {"pass": false, "kind": "검사 우회"},
+  "09.md": {"pass": false, "kind": "검사 우회"},
+  "10.md": {"pass": true, "kind": "정상"}
+}
