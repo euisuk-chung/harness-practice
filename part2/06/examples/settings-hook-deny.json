@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "deny": ["Edit(sources/**)"]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {"type": "command", "command": "uv run python .claude/hooks/protect.py"}
+        ]
+      }
+    ]
+  }
+}

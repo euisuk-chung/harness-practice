@@ -30,18 +30,24 @@ def call_claude():
     return done.stdout
 
 
+def load(text, what):
+    try:
+        return json.loads(text)
+    except json.JSONDecodeError:
+        fail(f"{what} JSON 으로 읽을 수 없습니다")
+
+
 def main():
     if len(sys.argv) > 1:
-        outer = json.loads(Path(sys.argv[1]).read_text(encoding="utf-8"))
+        outer = load(Path(sys.argv[1]).read_text(encoding="utf-8"), "바깥 응답을")
     else:
-        outer = json.loads(call_claude())
+        outer = load(call_claude(), "바깥 응답을")
         (HERE / "response.json").write_text(
             json.dumps(outer, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
-    try:
-        result = json.loads(outer["result"])
-    except json.JSONDecodeError:
-        fail("result 를 JSON 으로 읽을 수 없습니다")
+    if not isinstance(outer, dict) or not isinstance(outer.get("result"), str):
+        fail("바깥 응답에 글로 된 result 칸이 없습니다")
+    result = load(outer["result"], "result 를")
 
     schema = json.loads((HERE / "schema.json").read_text(encoding="utf-8"))
     errors = list(Draft202012Validator(schema).iter_errors(result))

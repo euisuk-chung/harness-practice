@@ -1,0 +1,10 @@
+{
+  "cwd": ".",
+  "hook_event_name": "PreToolUse",
+  "tool_name": "Edit",
+  "tool_input": {
+    "file_path": "summary.md",
+    "old_string": "- 한 번에 5권까지 빌릴 수 있다",
+    "new_string": "- 한 번에 7권까지 빌릴 수 있다"
+  }
+}

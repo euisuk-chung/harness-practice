@@ -1,0 +1,9 @@
+{
+  "cwd": ".",
+  "hook_event_name": "PreToolUse",
+  "tool_name": "Write",
+  "tool_input": {
+    "file_path": "sources/notice.txt",
+    "content": "동네 도서관 이용 안내\n"
+  }
+}
