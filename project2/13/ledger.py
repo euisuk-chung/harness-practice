@@ -4,8 +4,9 @@
     uv run python ledger.py show               # 가계부에 적힌 줄 보기
 
 검사하는 것(판단하지 않고 모양만 본다):
-- 빈 칸 — date · store · amount · category · payment 가 모두 채워졌나. 비었으면 unread 에 적힌 이유를 함께 찍는다
-- 형식 — date 는 달력에 있는 YYYY-MM-DD, amount 는 0 보다 큰 정수,
+- 빈 칸 — date · store · amount · category · payment 가 모두 채워졌나(공백뿐인 글자도 빈 칸). 비었으면 unread 에 적힌 이유를 함께 찍는다
+- 형식 — date · store · category · payment 는 글자, unread 는 칸마다 이유를 적는 객체,
+          date 는 달력에 있는 YYYY-MM-DD, amount 는 0 보다 큰 정수,
           category 는 skill 의 분류 표에 있는 이름, payment 는 카드 또는 현금
 
 exit code — 0: 기록함 · 3: 기록하지 않음(이유를 한 줄씩 찍는다 — runner 가 human_queue 에 남긴다) · 1: 실행 오류
@@ -43,11 +44,20 @@ def categories():
 def check(entry):
     """기록하면 안 되는 이유를 모아 돌려준다. 비어 있으면 통과."""
     problems = []
-    unread = entry.get("unread") or {}
+    unread = entry.get("unread", {})
+    if not isinstance(unread, dict):
+        problems.append(f"형식 — unread: {unread!r} — 칸마다 이유를 적는 객체가 아닙니다")
+        unread = {}
+    filled = {}                                   # 채웠고 자료형이 맞는 칸
     for f in FIELDS:
-        if entry.get(f) in (None, ""):
+        v = entry.get(f)
+        if v is None or (isinstance(v, str) and not v.strip()):
             problems.append(f"빈 칸 — {f}: {unread.get(f, '이유가 적혀 있지 않습니다')}")
-    d = entry.get("date")
+        elif f != "amount" and not isinstance(v, str):
+            problems.append(f"형식 — {f}: {v!r} — 글자가 아닙니다")
+        else:
+            filled[f] = v
+    d = filled.get("date")
     if d:
         try:
             if len(str(d)) != 10:
@@ -55,13 +65,13 @@ def check(entry):
             date.fromisoformat(str(d))
         except ValueError:
             problems.append(f"형식 — date: {d} — 달력에 있는 YYYY-MM-DD 날짜가 아닙니다")
-    a = entry.get("amount")
-    if a not in (None, "") and (type(a) is not int or a <= 0):
+    a = filled.get("amount")
+    if a is not None and (type(a) is not int or a <= 0):
         problems.append(f"형식 — amount: {a!r} — 0 보다 큰 정수가 아닙니다")
-    c = entry.get("category")
+    c = filled.get("category")
     if c and c not in categories():
         problems.append(f"형식 — category: {c} — skill 의 분류 표에 없는 이름입니다")
-    p = entry.get("payment")
+    p = filled.get("payment")
     if p and p not in PAYMENTS:
         problems.append(f"형식 — payment: {p} — 카드 · 현금 가운데 하나가 아닙니다")
     return problems

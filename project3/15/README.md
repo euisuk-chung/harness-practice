@@ -1,6 +1,6 @@
 # project3 — 조사를 subagent 넷에게 나눠 맡기는 여행 계획
 
-프로젝트 3 여행 계획의 시작 상태입니다. `trip.yaml` 에 도시 · 날짜 · 내 이동 한도를 적고, Claude Code 의 본 세션이 날씨 · 문화 · 뉴스 · 명소 subagent 넷을 차례로 부르면, 넷이 각자 웹에서 조사한 결과를 `research/<이름>.json` 에 남깁니다. 경로 hook 이 쓰기를 `research/<이름>.json` 으로 좁히고, 불릴 때마다 누가 어느 파일을 썼는지 `hook-log.jsonl` 에 한 줄 남깁니다.
+프로젝트 3 여행 계획의 시작 상태입니다. `trip.yaml` 에 도시 · 날짜 · 내 이동 한도를 적고, Claude Code 의 본 세션이 날씨 · 문화 · 뉴스 · 명소 subagent 넷을 차례로 부르면, 넷이 각자 웹에서 조사한 결과를 `research/<이름>.json` 에 남깁니다. 경로 hook 이 쓰기를 `research/` 안의 `.json` 으로 좁히고(어느 subagent 가 어느 파일을 쓰는지는 가리지 않습니다), 불릴 때마다 누가 어느 파일을 썼는지 `hook-log.jsonl` 에 한 줄 남깁니다.
 `project3` 아래 번호 폴더는 차시마다의 시작 상태 전체입니다. 앞 실습을 끝내지 못했으면 그 폴더를 통째로 복사해 따라잡습니다.
 
 | 파일 | 하는 일 |
@@ -11,7 +11,7 @@
 | `examples/agents/news.md` | 뉴스 subagent — 지난 30일의 교통 · 공사 · 요금 · 안전 소식 → `research/news.json` |
 | `examples/agents/sights.md` | 명소 subagent — 대표 명소 다섯의 운영 시간 · 쉬는 날 → `research/sights.json` |
 | `examples/settings.json` | 경로 hook 을 거는 설정 — `.claude/settings.json` 으로 복사한다 |
-| `.claude/hooks/protect.py` | PreToolUse hook — Edit · Write 를 `research/<이름>.json` 에만 허용(exit code 0), 그 밖은 막는다(exit code 2). 어떤 예외도 막는다 |
+| `.claude/hooks/protect.py` | PreToolUse hook — Edit · Write 를 `research/` 안의 `.json` 에만 허용(exit code 0), 그 밖은 막는다(exit code 2). 어떤 예외도 막는다 |
 | `fixtures/hook/` | Claude 없이 hook 을 시험하는 입력 — 결과 파일 쓰기(`write-weather.json`) · `trip.yaml` 고치기(`write-trip.json`) · 폴더 밖 쓰기(`write-outside.json`) · 깨진 입력(`broken.json`) |
 | `research/` | subagent 넷의 결과 파일이 모이는 폴더 |
 

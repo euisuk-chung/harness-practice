@@ -8,10 +8,10 @@
 | `trip.yaml` | 내 여행 — 도시 · 나라 · 첫날 · 마지막 날 · 하루 시작 · 끝 시각 · 내 이동 한도(하루 이동 시간 합계, 분). 내 여행으로 고친다 |
 | `examples/agents/weather.md` · `culture.md` · `news.md` · `sights.md` | 조사 subagent 넷 — 각자 `research/<이름>.json` 에 결과를 남긴다 |
 | `examples/agents/planner.md` | 일정 subagent — `research/*.json` 과 `trip.yaml` 을 읽어 `plans/<번호>.json` 에 일정 안을 짠다. 웹은 조사하지 않는다 |
-| `constraints.py` | constraint check — 안마다 날짜 · 운영 시간 · 하루 이동 한도 · 출처를 확인한다. 모두 통과 exit code 0, 거부가 있으면 이유와 1, 거부는 없지만 확인 못 한 정보가 남았으면 3. 거부가 없으면 `choices.md` 를 쓴다 |
+| `constraints.py` | constraint check — 안마다 모양(여행 날짜마다 한 번 · `HH:MM` · 0 이상의 정수 분 · 출발이 도착보다 이르지 않음)을 먼저 보고, 날짜 · 운영 시간 · 하루 이동 한도 · 출처를 확인한다. 모두 통과 exit code 0, 거부가 있으면 이유와 1, 거부는 없지만 확인 못 한 정보가 남았으면 3. 거부가 없으면 `choices.md` 를 쓴다 |
 | `choose.py` | `uv run python choose.py <번호>` — 고른 안을 같은 검사로 한 번 더 확인하고 `plan.json` 으로 확정한다. 거부된 안은 확정하지 않는다(exit code 1) |
 | `examples/settings.json` | 경로 hook 을 거는 설정 — `.claude/settings.json` 으로 복사한다 |
-| `.claude/hooks/protect.py` | PreToolUse hook — 조사 subagent 는 `research/<이름>.json` 에만, planner 는 `plans/<번호>.json` 에만 쓰게 한다(허용 exit code 0, 막음 2). `plan.json` 은 어느 subagent 도 쓰지 못한다 |
+| `.claude/hooks/protect.py` | PreToolUse hook — planner 는 `plans/<번호>.json` 에만, 조사 subagent · 본 세션은 `research/` 안의 `.json` 에만 쓰게 한다(허용 exit code 0, 막음 2). 조사 subagent 와 자기 파일의 짝은 보지 않는다. `plan.json` 은 어느 subagent 도 쓰지 못한다 |
 | `fixtures/hook/` | Claude 없이 hook 을 시험하는 입력 — planner 의 일정 안 쓰기(`write-plan.json`) · planner 의 `plan.json` 쓰기(`write-final.json`)와 조사 결과 쓰기 · 막는 경우 넷 |
 | `fixtures/ok/` · `fixtures/bad/` | Claude 없이 constraint check 를 시험하는 여행 폴더 — 가능한 일정 하나(`ok`)와 불가능한 일정 하나(`bad`) |
 | `research/` · `plans/` | 조사 결과와 일정 안이 모이는 폴더 |
@@ -24,7 +24,7 @@
            "stops": [{"ref": "sights-1", "name": "", "arrive": "09:30", "depart": "11:00", "stay_minutes": 90, "move_minutes": 30, "source": "", "checked": "확인"}]}]}
 ```
 
-`move_minutes` 는 앞 장소(그날 첫 장소면 숙소)에서 그 장소까지의 이동 시간입니다. planner 가 짐작한 값이고, constraint check 는 그 합이 내 이동 한도를 넘는지만 봅니다.
+여행 날짜는 `days` 에 하루 한 번씩 모두 적고, 들르는 곳이 없는 날은 `stops` 를 빈 목록 `[]` 으로 둡니다. `move_minutes` 는 앞 장소(그날 첫 장소면 숙소)에서 그 장소까지의 이동 시간입니다. planner 가 짐작한 값이고, constraint check 는 그 합이 내 이동 한도를 넘는지만 봅니다.
 
 ## 내 여행 폴더에 더하기
 
@@ -40,7 +40,7 @@ cd ~/my-trip
 uv sync
 ```
 
-`~/my-trip` 이 없으면 이 폴더를 통째로 복사하고, `project3/15/README.md` 대로 subagent 정의 · 설정을 복사한 뒤 조사부터 실행합니다.
+`~/my-trip` 이 없으면 이 폴더를 통째로 복사하고, subagent 정의 · 설정을 놓은 뒤 조사부터 실행합니다.
 
 ```bash
 cd ~
@@ -51,6 +51,15 @@ cp examples/agents/*.md .claude/agents/
 cp examples/settings.json .claude/settings.json
 uv sync
 ```
+
+`trip.yaml` 의 도시 · 날짜 · 이동 한도를 내 여행으로 고친 뒤, 조사 subagent 넷에게 조사를 맡기고 결과 파일을 확인합니다.
+
+```bash
+claude -p "weather · culture · news · sights subagent 를 차례로 불러 각자 결과 파일을 남기게 하세요. 직접 조사하지 마세요. 넷이 끝나면 research/ 의 결과 파일 넷을 읽고, 파일마다 항목 수와 「모름」 인 항목 수를 알려 주세요." --allowedTools "Agent,WebSearch,WebFetch,Write"
+ls research                                                                # culture.json  news.json  sights.json  weather.json
+```
+
+`claude -p` 는 Claude 를 부르고, subagent 넷이 웹을 조사합니다. 넷이 끝날 때까지 화면에는 아무것도 찍히지 않습니다. `ls research` 에 결과 파일 넷이 모두 보이면 아래 「실행」 으로 갑니다. 결과는 실행마다 다릅니다.
 
 ## 실행
 

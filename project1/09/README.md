@@ -8,7 +8,7 @@
 | `make_site.py` | `posts/` 의 글로 블로그 페이지 `docs/` 를 만든다. 글이 없으면 「아직 올라온 글이 없습니다.」만 적는다 |
 | `docs/` | GitHub Pages 가 올리는 폴더. `.nojekyll` 은 다른 변환 없이 그대로 올리라는 표시 |
 | `runner.py` | `graph.yaml` 을 읽어 단계를 차례로 실행하는 runner |
-| `examples/PLAN.md` | 과제 · 핵심 세 줄 · 조건마다 반영할 설정과 파일 |
+| `examples/PLAN.md` | 과제 · 핵심 요약 · 조건마다 반영할 설정과 파일 |
 | `examples/graph.yaml` | 수집 → 작성 → 검사 → 승인 graph 초안. 단계 파일이 아직 없어 실행하지 않는다 |
 | `examples/CLAUDE.md` | 내 독자 · 말투 · 하지 말 것 |
 

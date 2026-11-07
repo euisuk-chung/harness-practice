@@ -9,8 +9,8 @@
 | `examples/graph.yaml` | 읽기(read) → 형식 검사와 기록(add) graph. 맨 위로 복사한다 |
 | `prompts/read.md` | 읽기 프롬프트 — `inbox/` 의 새 영수증을 skill 대로 JSON 한 줄로. 영수증 경로는 `current.txt` 에 있다 |
 | `runner.py` | `graph.yaml` 을 읽어 단계를 차례로 실행하는 runner(프로젝트 1 과 같은 파일) |
-| `ledger.py` | `add entry.json` — 빈 칸 · 날짜 · 금액 · 분류 · 결제 수단을 검사하고 통과하면 `ledger.xlsx` 에 한 줄(exit code 0), 아니면 이유를 찍고 exit code 3. 분류 이름은 skill 의 분류 표에서 읽는다. `show` — 가계부에 적힌 줄 보기 |
-| `watch.py` | 폴더 trigger — `inbox/` 를 2초마다 보고 새 파일마다 runner 를 실행한다. 끝나면 영수증을 `done/`(기록함) 또는 `review/`(이유는 `review/<이름>.txt`)로 옮긴다. `--once` 는 지금 있는 파일만 처리하고 끝낸다 |
+| `ledger.py` | `add entry.json` — 빈 칸(공백뿐인 칸도) · 칸의 자료형 · 날짜 · 금액 · 분류 · 결제 수단을 검사하고 통과하면 `ledger.xlsx` 에 한 줄(exit code 0), 아니면 이유를 찍고 exit code 3. 분류 이름은 skill 의 분류 표에서 읽는다. `show` — 가계부에 적힌 줄 보기 |
+| `watch.py` | 폴더 trigger — `inbox/` 를 2초마다 보고 새 파일마다 runner 를 실행한다. 끝나면 영수증을 `done/`(기록함) 또는 `review/`(이유는 `review/<이름>.txt`)로 옮긴다. 두 폴더에 같은 이름이 있으면 덮어쓰지 않고 `photo-2.png` 처럼 새 이름을 붙인다(가계부의 영수증 칸에도 새 이름). `--once` 는 지금 있는 파일만 처리하고 끝낸다 |
 | `receipts/` | 연습 영수증 셋 — `r01.png` 정상 · `r02.png` 윗부분이 찢어져 상호가 없음 · `r03.png` 없는 날짜(9월 31일)가 적힌 간이영수증. 가게 이름 · 주소는 지어낸 것이다 |
 | `inbox/` · `review/` | 영수증을 넣는 폴더 · 사람이 볼 영수증이 모이는 폴더 |
 | `fixtures/entry/` | 형식 검사 시험용 JSON — 통과 하나(`good.json`), 빈 칸(`missing.json`), 없는 날짜(`bad-date.json`), 글자로 된 금액(`bad-amount.json`) |
@@ -21,7 +21,7 @@
 ```bash
 cd ~
 cp -r harness-practice/project2/13 my-ledger
-cd my-ledger
+cd ~/my-ledger
 mkdir -p .claude/skills/ledger-rules
 cp examples/SKILL.md .claude/skills/ledger-rules/SKILL.md
 cp examples/graph.yaml .

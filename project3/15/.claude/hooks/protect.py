@@ -1,4 +1,6 @@
-"""PreToolUse hook — 조사 결과 파일 research/<이름>.json 만 쓰게 한다.
+"""PreToolUse hook — Edit · Write 를 research/ 안의 .json 파일에만 허용한다.
+
+어느 subagent 가 어느 파일을 쓰는지(weather 가 research/weather.json 을 쓰는지)는 가리지 않는다 — 이름은 기록에만 쓴다.
 
 Claude Code 는 Edit · Write 도구를 쓰기 직전에 이 스크립트를 부르고, 그 도구 호출을 JSON 으로 stdin 에 넣어 준다.
 subagent 가 부른 도구에도 같은 hook 이 불리고, 그때는 JSON 에 subagent 의 이름(agent_type)이 함께 온다.

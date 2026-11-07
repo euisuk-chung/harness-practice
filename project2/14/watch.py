@@ -5,9 +5,10 @@
     uv run python watch.py inbox/ --once --answers fixtures/answers   # Claude 대신 저장해 둔 응답(<이름>.json)
 
 영수증 하나마다:
-1. 경로를 current.txt 에 적고, 지난 영수증의 state.json · human_queue/ · entry.json 을 지운다
-2. runner.py 로 graph.yaml 을 실행한다 — 같은 파일 확인(seen) → 읽기(read) → 중복 의심 점수(dup) → 형식 검사와 기록(add)
-3. runner 가 0 으로 끝나면 영수증을 done/ 으로, 아니면 review/ 로 옮기고 이유를 review/<이름>.txt 에 적는다
+1. done/ · review/ 에 같은 이름이 있으면 photo-2.png 처럼 새 이름으로 바꾼다 — 보관한 사진을 덮어쓰지 않고, 가계부의 영수증 칸에도 새 이름이 적힌다
+2. 경로를 current.txt 에 적고, 지난 영수증의 state.json · human_queue/ · entry.json 을 지운다
+3. runner.py 로 graph.yaml 을 실행한다 — 같은 파일 확인(seen) → 읽기(read) → 중복 의심 점수(dup) → 형식 검사와 기록(add)
+4. runner 가 0 으로 끝나면 영수증을 done/ 으로, 아니면 review/ 로 옮기고 이유를 review/<이름>.txt 에 적는다
 
 순서는 기록 → 표시다. 가계부에 한 줄을 기록한 뒤에야 영수증을 done/ 으로 옮겨 「처리했다」고 표시한다.
 그 사이에 멈추면 영수증이 inbox/ 에 남는다. 다시 실행하면 seen 단계가 가계부의 content hash 를 보고
@@ -33,6 +34,19 @@ def new_files(inbox):
     return sorted(p for p in inbox.iterdir() if p.is_file() and not p.name.startswith("."))
 
 
+def unique(receipt):
+    """done/ · review/ 에 같은 이름(review/ 는 <이름>.txt 도)이 있으면 photo-2.png … 로 바꿔 그 경로를 돌려준다."""
+    name, n = receipt.name, 1
+    while any(p.exists() for p in (DONE / name, REVIEW / name, REVIEW / f"{Path(name).stem}.txt")) \
+            or (n > 1 and (receipt.parent / name).exists()):
+        n += 1
+        name = f"{receipt.stem}-{n}{receipt.suffix}"
+    if name == receipt.name:
+        return receipt
+    print(f"[watch] 같은 이름이 done/ · review/ 에 있습니다 — {receipt.name} → {name}", flush=True)
+    return receipt.rename(receipt.with_name(name))
+
+
 def why_human():
     """runner 가 human_queue/ 에 남긴 이유를 모은다."""
     items = [json.loads(p.read_text(encoding="utf-8")) for p in sorted(Path("human_queue").glob("*.json"))]
@@ -40,13 +54,15 @@ def why_human():
 
 
 def handle(receipt, answers, stop_after_record=False):
+    stem = receipt.stem                         # 저장해 둔 응답은 처음 이름으로 찾는다
+    receipt = unique(receipt)                   # 이름이 겹치면 새 이름으로
     CURRENT.write_text(receipt.as_posix(), encoding="utf-8")
     for old in (Path("state.json"), Path("entry.json")):
         old.unlink(missing_ok=True)
     shutil.rmtree("human_queue", ignore_errors=True)
     cmd = [sys.executable, "runner.py", "graph.yaml"]
     if answers:
-        cmd += ["--answer", str(Path(answers) / f"{receipt.stem}.json")]
+        cmd += ["--answer", str(Path(answers) / f"{stem}.json")]
     print(f"[watch] 새 영수증 {receipt.name} — runner 를 실행합니다", flush=True)
     code = subprocess.run(cmd).returncode
     if code == 0 and stop_after_record:

@@ -8,7 +8,7 @@
 | `make_site.py` | `posts/` 의 글로 블로그 페이지 `docs/` 를 만든다. 글이 없으면 「아직 올라온 글이 없습니다.」만 적는다 |
 | `docs/` | GitHub Pages 가 올리는 폴더. `.nojekyll` 은 다른 변환 없이 그대로 올리라는 표시 |
 | `runner.py` | `graph.yaml` 을 읽어 단계를 차례로 실행하는 runner |
-| `examples/PLAN.md` | 과제 · 핵심 세 줄 · 조건마다 반영할 설정과 파일 |
+| `examples/PLAN.md` | 과제 · 핵심 요약 · 조건마다 반영할 설정과 파일 |
 | `examples/graph.yaml` | 수집(collect) → 세기(count) → 작성(write) → 검사(check) → 승인(approve) graph. 검사가 거부하면 이유를 붙여 작성을 다시, 승인 단계가 PR 을 열면 exit code 3 으로 멈춘다 |
 | `examples/graph-retry.yaml` | 작성 → 검사만 있는 연습 graph. 다시 쓰기와 human queue 를 PR 없이 시험한다 |
 | `examples/CLAUDE.md` | 내 독자 · 말투 · 하지 말 것 |
@@ -47,7 +47,7 @@ GitHub 의 저장소 화면에서 Settings → Pages 로 가서, Build and deplo
 
 내 컴퓨터에서 먼저 보려면 `uv run python -m http.server 8001 --directory docs` 를 실행하고 브라우저로 `http://localhost:8001` 을 엽니다. 끝낼 때는 `Ctrl+C` 를 누릅니다.
 
-## 앞 차시 폴더에서 이어 받기
+## 쓰던 `~/my-blog` 에 더하기
 
 이미 `~/my-blog` 가 있으면 이번에 더해지거나 바뀐 것만 복사하고, graph 를 제자리에 둡니다.
 

@@ -7,7 +7,7 @@
 - claude 단계: 프롬프트 파일로 `claude -p` 를 한 번 부르고, 답(result)을 output 파일에 쓴다
 - run 단계: 명령을 실행하고 exit code 를 읽는다 — 0 통과 · 1 거부(이유를 찍는다) · 3 사람에게 · 4 할 일 없음
 
-단계를 마칠 때마다 상태를 state.json 에 남긴다. 멈췄다가 다시 실행하면 거기서 이어 간다.
+단계를 마칠 때마다 상태를 state.json 에 남긴다. 멈췄다가 다시 실행하면 멈춘 자리부터 다시 실행한다.
 exit code — 0: 끝 · 1: 실패(graph 오류, 실행할 수 없는 명령, 예상하지 못한 결과) · 3: 사람 차례(human_queue/ 에 남김)
 """
 import argparse
@@ -42,11 +42,11 @@ def load_graph(path):
 
 
 def load_state(path, graph):
-    """같은 graph 로 실행하다 멈춘 state.json 이 있으면 이어 가고, 없으면 새로 시작한다."""
+    """같은 graph 로 실행하다 멈춘 state.json 이 있으면 그 상태를 읽어 멈춘 자리부터 다시 실행하고, 없으면 새로 시작한다."""
     if STATE.exists():
         state = json.loads(STATE.read_text(encoding="utf-8"))
         if state["status"] == "running" and state["graph"] == path:
-            print(f"state.json 에서 이어 갑니다 — 다음 단계 {state['step']}")
+            print(f"state.json 의 멈춘 자리부터 다시 실행합니다 — 다음 단계 {state['step']}")
             return state
     return {"graph": path, "status": "running", "step": graph["start"],
             "attempts": {}, "reason": "", "last": "", "history": []}
@@ -187,5 +187,5 @@ if __name__ == "__main__":
     try:
         sys.exit(main())
     except KeyboardInterrupt:
-        print("\n멈췄습니다 — 다시 실행하면 state.json 에서 이어 갑니다")
+        print("\n멈췄습니다 — 다시 실행하면 state.json 의 멈춘 자리부터 시작합니다")
         sys.exit(130)

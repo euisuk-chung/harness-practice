@@ -10,7 +10,7 @@
 | `runner.py` | `graph.yaml` 을 읽어 단계를 차례로 실행하는 runner |
 | `daily.py` | 하루 한 번 실행 — run ID(오늘 날짜)를 정하고, origin 에 `draft/<날짜>` branch 나 그 PR 이 있으면 건너뛴다. 없으면 runner 를 부르고 운영 기록을 남긴 뒤 `steps/audit.py` 로 점검한다. PR 을 연 날은 운영 기록을 그 branch 에 커밋해 push 한다 |
 | `examples/daily.yml` | GitHub Actions workflow. `.github/workflows/daily.yml` 로 복사한다 — 매일 UTC 22:00(한국 07:00) · 손으로 실행(`workflow_dispatch`) · 한 번에 하나만(`concurrency`) · secret `CLAUDE_CODE_OAUTH_TOKEN` |
-| `examples/PLAN.md` | 과제 · 핵심 세 줄 · 조건마다 반영할 설정과 파일 |
+| `examples/PLAN.md` | 과제 · 핵심 요약 · 조건마다 반영할 설정과 파일 |
 | `examples/graph.yaml` | 수집(collect) → 세기(count) → 작성(write) → 검사(check) → 승인(approve) graph. 검사가 거부하면 이유를 붙여 작성을 다시, 승인 단계가 PR 을 열면 exit code 3 으로 멈춘다 |
 | `examples/graph-retry.yaml` | 작성 → 검사만 있는 연습 graph. 다시 쓰기와 human queue 를 PR 없이 시험한다 |
 | `examples/CLAUDE.md` | 내 독자 · 말투 · 하지 말 것 |
@@ -19,7 +19,7 @@
 | `prompts/write.md` | 작성 프롬프트 — 숫자 · 인용은 원문 파일에 있는 것만 · 뉴스레터 형식 · 주장 목록 · 뺀 소식(제목 · 원문 · 이유) |
 | `steps/check.py` | 블로그 검사 — 구조 · 출처와 기간 · 원문 대조(숫자 · 인용) · 형식 · 근거. 통과 0 · 거부 1(이유를 찍는다) |
 | `steps/approve.py` | 초안의 글을 `posts/<날짜>.md` 로 쓰고 `docs/` 를 다시 만든 뒤, branch `draft/<날짜>` 를 push 하고 PR 을 연다. `needs_approval` 을 찍고 exit code 3 |
-| `steps/audit.py` | 운영 기록 점검 — 끝 줄이 없거나, 새 글이 있었는데 collect 단계의 hook 기록이 없으면 거부(exit code 1). 통과하면 운영 점검표를 찍는다 |
+| `steps/audit.py` | 운영 기록 점검 — 끝 줄이 없거나, 모양이 다른 줄이 있거나(몇 번째 줄인지 찍는다), 새 글이 있었는데 collect 단계의 hook 기록이 없으면 거부(exit code 1). 통과하면 운영 점검표를 찍는다. 단계 줄이 통째로 빠진 기록은 보지 않는다 |
 | `steps/count.py` | `sources.json` 의 status 로 갈 곳을 정한다 — 새 글 있음 0(error 칸에 적힌 것이 있으면 함께 찍음) · 새 글 0건 4 · 수집 실패 1(수집을 다시). empty 인데 items · error 가 찬 결과, 모양이 틀린 결과, 원문 파일이 블로그 폴더 밖인 결과도 1 |
 | `.claude/hooks/protect.py` | collect 단계만 `runs/<날짜>/sources/` 에 쓰게 하는 PreToolUse hook. 막을 때 exit code 2. 불릴 때마다 운영 기록(환경 변수 `RUN_LOG`)에 허용 · 막음 한 줄을 남긴다 |
 | `fixtures/` | Claude 를 부르지 않고 시험하는 입력 — 새 글 0건 · 수집 오류 · 일부 사이트만 확인한 수집 결과 · count 가 거부하는 수집 결과 셋(`empty-error` · `wrong-type` · `outside`) · hook 에 넣을 도구 호출 둘 · 틀린 인용 초안을 내는 작성 응답(`wrong-quote.json`) · 검사 단계부터 다시 시작하는 상태(`state-retry.json`) |
@@ -53,7 +53,7 @@ GitHub 의 저장소 화면에서 Settings → Pages 로 가서, Build and deplo
 
 내 컴퓨터에서 먼저 보려면 `uv run python -m http.server 8001 --directory docs` 를 실행하고 브라우저로 `http://localhost:8001` 을 엽니다. 끝낼 때는 `Ctrl+C` 를 누릅니다.
 
-## 앞 차시 폴더에서 이어 받기
+## 쓰던 `~/my-blog` 에 더하기
 
 이미 `~/my-blog` 가 있으면 이번에 더해지거나 바뀐 것만 복사하고, workflow 를 제자리에 둡니다.
 
