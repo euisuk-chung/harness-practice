@@ -1,0 +1,7 @@
+{"t": "run", "at": "2026-11-06T04:06:26-12:00", "run_id": "2026-11-06", "trigger": "local"}
+{"t": "step", "at": "2026-11-06T04:06:26-12:00", "step": "collect", "attempt": 1, "result": "ok"}
+{"t": "step", "at": "2026-11-06T04:08:22-12:00", "step": "count", "attempt": 1, "result": "ok", "exit": 0}
+{"t": "step", "at": "2026-11-06T04:08:22-12:00", "step": "write", "attempt": 1, "result": "ok"}
+{"t": "step", "at": "2026-11-06T04:09:17-12:00", "step": "check", "attempt": 1, "result": "ok", "exit": 0}
+{"t": "step", "at": "2026-11-06T04:09:17-12:00", "step": "approve", "attempt": 1, "result": "human", "exit": 3, "why": "needs_approval — PR 을 열었습니다: https://github.com/<아이디>/my-blog/pull/1"}
+{"t": "end", "at": "2026-11-06T04:09:18-12:00", "runner_exit": 3, "status": "human"}

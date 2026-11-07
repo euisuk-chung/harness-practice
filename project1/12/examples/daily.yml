@@ -1,0 +1,39 @@
+# 프로젝트 1 — 매일 아침 7시(한국 시간)에 블로그 graph 를 실행하는 workflow
+# .github/workflows/daily.yml 로 복사해 GitHub 에 올리면, PC 가 꺼져 있어도 GitHub 의 컴퓨터가 실행한다.
+name: daily
+
+on:
+  schedule:
+    - cron: "0 22 * * *"        # 분 시 일 월 요일 — 매일 UTC 22:00 = 한국 다음 날 07:00
+  workflow_dispatch:             # Actions 화면의 Run workflow 버튼이나 gh workflow run 으로 손으로 실행
+
+concurrency:
+  group: daily                   # lock — 이 workflow 는 한 번에 하나만 실행한다
+  cancel-in-progress: false      # 실행 중인 것은 끊지 않는다. 기다릴 수 있는 실행은 하나 — 하나 더 오면 기다리던 것이 취소된다
+
+permissions:
+  contents: write                # draft branch 를 push 한다
+  pull-requests: write           # PR 을 연다
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      TZ: Asia/Seoul             # run ID 를 한국 날짜로 — UTC 22시는 UTC 로는 아직 전날이다
+    steps:
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v10.3.3
+      - name: Claude Code 설치
+        run: |
+          curl -fsSL https://claude.ai/install.sh | bash
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+      - name: 커밋에 남길 이름
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+      - name: 오늘 실행
+        env:
+          CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}   # 로그인 대신 — 내 구독 계정의 토큰
+          GH_TOKEN: ${{ github.token }}                                      # gh 가 PR 을 열 때 쓰는 이 실행의 토큰
+        run: uv run python daily.py

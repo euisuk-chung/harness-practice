@@ -1,0 +1,10 @@
+state.json
+human_queue/
+entry.json
+current.txt
+ledger.xlsx
+done/
+inbox/*
+!inbox/.gitkeep
+review/*
+!review/.gitkeep

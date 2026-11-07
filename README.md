@@ -12,6 +12,8 @@
 | `project1/09` | 프로젝트 1 블로그의 시작 저장소입니다. `project1` 아래 번호 폴더마다 그 차시 시작 상태 전체가 들어 있습니다. 이 폴더를 복사해 내 GitHub 계정의 새 저장소로 올리고 GitHub Pages 로 빈 블로그를 엽니다. `make_site.py` 가 `posts/` 의 글로 `docs/` 를 만들고, `examples/` 에 계획서 `PLAN.md`·graph 초안·`CLAUDE.md` 가 있습니다. 자세한 것은 그 폴더의 `README.md` 에 있습니다. |
 | `project1/10` | 블로그에 수집 · 작성 단계를 더한 상태입니다. `prompts/` 의 수집 · 작성 프롬프트, 수집 결과를 세는 `steps/count.py`, 수집 단계만 `runs/<날짜>/sources/` 에 쓰게 하는 hook(`.claude/hooks/protect.py`), Claude 를 부르지 않고 시험하는 `fixtures/` 가 들어 있습니다. 이미 `~/my-blog` 가 있으면 더해지거나 바뀐 것만 복사합니다. 자세한 것은 그 폴더의 `README.md` 에 있습니다. |
 | `project1/11` | 블로그에 검사 · 승인 단계를 더한 상태입니다. 초안을 다섯 가지로 검사하는 `steps/check.py`, 통과한 초안으로 PR 을 여는 `steps/approve.py`, 작성 → 검사만 있는 연습 graph(`examples/graph-retry.yaml`), 검사마다 거부되는 초안이 든 `fixtures/check/` 가 들어 있습니다. 이미 `~/my-blog` 가 있으면 더해지거나 바뀐 것만 복사합니다. 자세한 것은 그 폴더의 `README.md` 에 있습니다. |
+| `project1/12` | 블로그를 매일 아침 저절로 실행하게 한 상태입니다. GitHub Actions workflow(`examples/daily.yml` — 매일 한국 시간 07:00 · 손으로 실행 · 한 번에 하나만), 그날 이미 실행했으면 건너뛰고 runner 를 불러 운영 기록 `runs/<날짜>/log.jsonl` 을 남기는 `daily.py`, 빠진 기록을 찾는 `steps/audit.py` 가 들어 있습니다. hook 은 불릴 때마다 운영 기록에 한 줄을 남깁니다. 이미 `~/my-blog` 가 있으면 더해지거나 바뀐 것만 복사합니다. 자세한 것은 그 폴더의 `README.md` 에 있습니다. |
+| `project2/13` | 프로젝트 2 가계부의 시작 상태입니다. 영수증을 `inbox/` 에 넣으면 폴더 trigger(`watch.py`)가 runner 를 실행하고, Claude 가 가계부 정리 skill(`examples/SKILL.md` — `.claude/skills/ledger-rules/SKILL.md` 로 복사)의 기준대로 영수증을 읽습니다. `ledger.py` 가 기록 전에 형식을 검사해 통과한 것만 Excel 가계부 `ledger.xlsx` 에 한 줄 더하고, 나머지는 이유와 함께 `review/` 로 보냅니다. 지어낸 연습 영수증 셋(`receipts/`)이 들어 있습니다. 자세한 것은 그 폴더의 `README.md` 에 있습니다. |
 
 ## 받기와 실행
 
