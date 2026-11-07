@@ -1,0 +1,23 @@
+# 프로젝트 2 graph — 영수증 한 장을 가계부 한 줄로, 두 번 적지 않게
+# 넣을 때마다 저절로 → graph 밖에서 watch.py 가 inbox/ 의 새 영수증마다 runner 를 부른다
+
+start: seen
+
+steps:
+  seen:   # 같은 파일 — content hash 가 가계부에 있으면 exit code 4, 읽지 않고 끝
+    run: python dedup.py seen
+    needs: [current.txt]
+    next: read
+  read:   # ledger-rules skill 의 기준대로 읽어 JSON 한 줄 · 못 읽은 칸은 비우고 이유
+    claude: prompts/read.md
+    args: ["--disallowedTools", "Bash,Write,Edit,WebSearch,WebFetch"]
+    output: entry.json
+    next: dup
+  dup:    # 같은 영수증 — 중복 의심 점수가 threshold 를 넘으면 exit code 3 으로 사람에게
+    run: python dedup.py score entry.json --threshold 70
+    needs: [entry.json]
+    next: add
+  add:    # 기록 전 형식 검사 — 통과하면 ledger.xlsx 에 한 줄(content hash 와 함께)
+    run: python ledger.py add entry.json
+    needs: [entry.json]
+    next: end

@@ -1,0 +1,10 @@
+{
+  "cwd": ".",
+  "hook_event_name": "PreToolUse",
+  "agent_type": "planner",
+  "tool_name": "Write",
+  "tool_input": {
+    "file_path": "plans/1.json",
+    "content": "{\"option\": 1, \"days\": []}"
+  }
+}

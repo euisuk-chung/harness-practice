@@ -1,0 +1,10 @@
+{
+  "cwd": ".",
+  "hook_event_name": "PreToolUse",
+  "agent_type": "weather",
+  "tool_name": "Write",
+  "tool_input": {
+    "file_path": "research/weather.json",
+    "content": "{\"agent\": \"weather\", \"items\": []}"
+  }
+}

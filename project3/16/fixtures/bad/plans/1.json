@@ -1,0 +1,56 @@
+{
+  "option": 1,
+  "title": "하루에 많이 보기",
+  "days": [
+    {
+      "date": "2026-12-11",
+      "stops": [
+        {
+          "ref": "sights-1",
+          "name": "기요미즈데라",
+          "arrive": "09:30",
+          "depart": "11:00",
+          "stay_minutes": 90,
+          "move_minutes": 30,
+          "source": "https://www.kiyomizudera.or.jp/access.php",
+          "checked": "확인"
+        },
+        {
+          "ref": "sights-4",
+          "name": "은각사",
+          "arrive": "15:40",
+          "depart": "17:00",
+          "stay_minutes": 80,
+          "move_minutes": 40,
+          "source": "https://www.shokoku-ji.jp/en/ginkakuji/access/",
+          "checked": "확인"
+        }
+      ]
+    },
+    {
+      "date": "2026-12-12",
+      "stops": [
+        {
+          "ref": "sights-5",
+          "name": "니조성",
+          "arrive": "09:50",
+          "depart": "11:50",
+          "stay_minutes": 120,
+          "move_minutes": 50,
+          "source": "https://nijo-jocastle.city.kyoto.lg.jp/?lang=en",
+          "checked": "확인"
+        },
+        {
+          "ref": "sights-3",
+          "name": "금각사",
+          "arrive": "13:00",
+          "depart": "14:30",
+          "stay_minutes": 90,
+          "move_minutes": 70,
+          "source": "https://www.shokoku-ji.jp/en/kinkakuji/access/",
+          "checked": "확인"
+        }
+      ]
+    }
+  ]
+}

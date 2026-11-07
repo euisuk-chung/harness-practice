@@ -8,7 +8,7 @@
 - run 단계: 명령을 실행하고 exit code 를 읽는다 — 0 통과 · 1 거부(이유를 찍는다) · 3 사람에게 · 4 할 일 없음
 
 단계를 마칠 때마다 상태를 state.json 에 남긴다. 멈췄다가 다시 실행하면 거기서 이어 간다.
-exit code — 0: 끝 · 1: 실패(graph 오류, 예상하지 못한 결과) · 3: 사람 차례(human_queue/ 에 남김)
+exit code — 0: 끝 · 1: 실패(graph 오류, 실행할 수 없는 명령, 예상하지 못한 결과) · 3: 사람 차례(human_queue/ 에 남김)
 """
 import argparse
 import json
@@ -27,10 +27,12 @@ RETRY = "앞 결과(draft.md)가 거부된 이유: {reason}. 이 이유만 고�
 
 
 def load_graph(path):
-    """graph 를 읽고, 갈 곳으로 적은 단계가 모두 있는지 먼저 본다."""
+    """graph 를 읽고, 단계마다 할 일(claude · run)과 갈 곳으로 적은 단계가 모두 있는지 먼저 본다."""
     graph = yaml.safe_load(Path(path).read_text(encoding="utf-8"))
     names = set(graph["steps"]) | {"end"}
     for name, step in graph["steps"].items():
+        if not step or ("claude" not in step and "run" not in step):
+            sys.exit(f"graph 오류 — {name} 단계에 claude 도 run 도 없습니다")
         for key in ("next", "on_reject"):
             if key in step and step[key] not in names:
                 sys.exit(f"graph 오류 — {name} 의 {key}: {step[key]} 라는 단계가 없습니다")
@@ -55,32 +57,42 @@ def save(state):
 
 
 def run_claude(step, graph, state, answer, env):
-    """claude -p 를 한 번 부른다. 결과: ok · error(호출 실패) · human(권한이 막힘)."""
+    """claude -p 를 한 번 부른다. 결과: ok · error(호출 실패) · human(권한이 막힘) · fail(부를 수 없음)."""
     prompt = Path(step["claude"]).read_text(encoding="utf-8")
     if state["reason"]:
         prompt += "\n\n" + graph.get("retry_prompt", RETRY).format(reason=state["reason"])
-    if answer:
-        out = Path(answer).read_text(encoding="utf-8")
-    else:
-        cmd = ["claude", "-p", prompt, "--output-format", "json"] + step.get("args", [])
-        out = subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8", env=env).stdout
+    try:
+        if answer:
+            out = Path(answer).read_text(encoding="utf-8")
+        else:
+            cmd = ["claude", "-p", prompt, "--output-format", "json"] + step.get("args", [])
+            out = subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8", env=env).stdout
+    except OSError as e:                           # claude 가 PATH 에 없거나 응답 파일이 없음 — 다시 해도 같다
+        return "fail", f"claude 를 부를 수 없습니다 — {e}"
     try:
         reply = json.loads(out)
     except json.JSONDecodeError:
+        reply = None
+    if not isinstance(reply, dict):
         return "error", "claude 의 응답을 읽을 수 없습니다"
     if reply.get("is_error"):
         return "error", f"claude 호출이 실패했습니다 — {reply.get('result', '')}"
     if reply.get("permission_denials"):
         tools = ", ".join(d.get("tool_name", "?") for d in reply["permission_denials"])
         return "human", f"권한이 막혔습니다 — {tools}"
+    if not isinstance(reply.get("result"), str):
+        return "error", "claude 의 응답에 result 가 없습니다"
     Path(step["output"]).write_text(reply["result"], encoding="utf-8")
     return "ok", ""
 
 
 def run_command(step, env):
     """명령을 실행한다. 결과: ok · reject(거부 이유) · human · nothing(할 일 없음) · fail."""
-    done = subprocess.run(shlex.split(step["run"]), capture_output=True, text=True,
-                          encoding="utf-8", env=env)
+    try:
+        done = subprocess.run(shlex.split(step["run"]), capture_output=True, text=True,
+                              encoding="utf-8", env=env)
+    except OSError as e:                           # 명령이 없음 — 다시 해도 같다
+        return "fail", f"명령을 실행할 수 없습니다 — {e}"
     said = " / ".join(line.removeprefix("거부 — ") for line in done.stdout.splitlines() if line.strip())
     if done.returncode == 0:
         return "ok", ""

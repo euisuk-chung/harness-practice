@@ -1,0 +1,8 @@
+hook-log.jsonl
+research/*
+!research/.gitkeep
+plans/*
+!plans/.gitkeep
+choices.md
+plan.json
+__pycache__/

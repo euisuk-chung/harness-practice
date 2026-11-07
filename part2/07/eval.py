@@ -34,9 +34,14 @@ def judge(text):
                               cwd=empty, capture_output=True, text=True, encoding="utf-8")
     try:
         result = json.loads(done.stdout)["result"]
-        return json.loads(re.search(r"\{.*\}", result, re.S).group())
-    except (json.JSONDecodeError, KeyError, AttributeError):
+        got = json.loads(re.search(r"\{.*\}", result, re.S).group())
+    except (json.JSONDecodeError, KeyError, TypeError, AttributeError):
+        got = None
+    # 두 칸(pass · reason)만 있고 pass 는 true · false, reason 은 글이어야 판정으로 쓴다
+    if (not isinstance(got, dict) or set(got) != {"pass", "reason"}
+            or not isinstance(got["pass"], bool) or not isinstance(got["reason"], str)):
         return {"pass": None, "reason": "판정을 읽을 수 없습니다"}
+    return got
 
 
 def main():

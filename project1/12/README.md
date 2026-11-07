@@ -20,11 +20,11 @@
 | `steps/check.py` | 검사 다섯 — 구조 · 출처와 기간 · 원문 대조(숫자 · 인용) · 형식 · 근거. 통과 0 · 거부 1(이유를 찍는다) |
 | `steps/approve.py` | 초안의 글을 `posts/<날짜>.md` 로 쓰고 `docs/` 를 다시 만든 뒤, branch `draft/<날짜>` 를 push 하고 PR 을 연다. `needs_approval` 을 찍고 exit code 3 |
 | `steps/audit.py` | 운영 기록 점검 — 끝 줄이 없거나, 새 글이 있었는데 collect 단계의 hook 기록이 없으면 거부(exit code 1). 통과하면 운영 점검표를 찍는다 |
-| `steps/count.py` | `sources.json` 의 status 로 갈 곳을 정한다 — 새 글 있음 0(error 칸에 적힌 것이 있으면 함께 찍음) · 새 글 0건 4 · 수집 실패 1(수집을 다시) |
+| `steps/count.py` | `sources.json` 의 status 로 갈 곳을 정한다 — 새 글 있음 0(error 칸에 적힌 것이 있으면 함께 찍음) · 새 글 0건 4 · 수집 실패 1(수집을 다시). empty 인데 items · error 가 찬 결과, 모양이 틀린 결과, 원문 파일이 블로그 폴더 밖인 결과도 1 |
 | `.claude/hooks/protect.py` | collect 단계만 `runs/<날짜>/sources/` 에 쓰게 하는 PreToolUse hook. 막을 때 exit code 2. 불릴 때마다 운영 기록(환경 변수 `RUN_LOG`)에 허용 · 막음 한 줄을 남긴다 |
-| `fixtures/` | Claude 를 부르지 않고 시험하는 입력 — 새 글 0건 · 수집 오류 · 일부 사이트만 확인한 수집 결과 · hook 에 넣을 도구 호출 둘 · 틀린 인용 초안을 내는 작성 응답(`wrong-quote.json`) · 검사 단계에서 이어 가는 상태(`state-retry.json`) |
+| `fixtures/` | Claude 를 부르지 않고 시험하는 입력 — 새 글 0건 · 수집 오류 · 일부 사이트만 확인한 수집 결과 · count 가 거부하는 수집 결과 셋(`empty-error` · `wrong-type` · `outside`) · hook 에 넣을 도구 호출 둘 · 틀린 인용 초안을 내는 작성 응답(`wrong-quote.json`) · 검사 단계에서 이어 가는 상태(`state-retry.json`) |
 | `fixtures/log/` | 운영 기록 점검 시험용 — 실제 실행 기록(`good.jsonl`), 거기서 hook 줄을 뺀 기록(`no-hook.jsonl`), 끝 줄이 없는 기록(`cut.jsonl`), 건너뛴 날의 기록(`skip.jsonl`) |
-| `fixtures/check/` | 검사 시험용 — 수집 결과와 원문 셋, 통과하는 초안 하나(`good.md`), 검사마다 거부되는 초안 다섯. 원문 `s1.md` 는 실제로 가져온 글이고, 날짜만 시험용으로 바꿨다 |
+| `fixtures/check/` | 검사 시험용 — 수집 결과와 원문 셋, 통과하는 초안 하나(`good.md`), 검사마다 거부되는 초안 다섯, 검사의 빈틈을 막았는지 보는 초안 넷(같은 소제목 두 번 · 빈 인용 · 부호가 다른 숫자는 거부, 약어 마침표 `abbrev.md` 는 통과). 원문 `s1.md` 는 실제로 가져온 글이고, 날짜만 시험용으로 바꿨다 |
 
 ## 내 저장소로 옮기기
 

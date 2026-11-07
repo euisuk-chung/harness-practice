@@ -4,6 +4,7 @@
 
 exit code — 0: 새 글이 있다 · 1: 거부(수집을 다시) · 4: 새 글 0건(할 일 없음, 남은 단계를 건너뛴다)
 가져온 글이 있으면 error 칸에 적힌 것(보지 못한 곳 등)이 있어도 0 — 그 글을 함께 찍는다
+모양이 틀린 결과, empty 인데 items 나 error 가 찬 결과, 원문 파일이 블로그 폴더 밖인 결과는 1
 """
 import json
 import sys
@@ -18,8 +19,15 @@ def main(path):
     except (OSError, json.JSONDecodeError) as e:
         print(f"거부 — {path} 를 JSON 으로 읽지 못했습니다({type(e).__name__})")
         return 1
+    if (not isinstance(found, dict) or not isinstance(found.get("items", []), list)
+            or not isinstance(found.get("error", ""), str)):
+        print("거부 — 수집 결과는 JSON 객체이고, items 는 목록, error 는 글이어야 합니다")
+        return 1
     status = found.get("status")
     if status == "empty":                     # 세 곳을 다 봤고 새 글이 없다 — 실패가 아니다
+        if found.get("items") or found.get("error"):
+            print("거부 — status 가 empty 인데 items 나 error 가 비어 있지 않습니다")
+            return 1
         print("새 글 0건 — 오늘은 올릴 글이 없습니다")
         return 4
     if status == "error":                     # 보지 못한 곳이 있다 — 0건이라고 말할 수 없다
@@ -33,9 +41,15 @@ def main(path):
         print("거부 — status 는 ok 인데 items 가 비었습니다")
         return 1
     for item in items:
-        lack = [key for key in NEED if not item.get(key)]
+        if not isinstance(item, dict):
+            print(f"거부 — items 의 글은 JSON 객체여야 합니다: {item!r}")
+            return 1
+        lack = [key for key in NEED if not item.get(key) or not isinstance(item[key], str)]
         if lack:
-            print(f"거부 — {item.get('id', '?')} 에 {', '.join(lack)} 이 없습니다")
+            print(f"거부 — {item.get('id', '?')} 에 {', '.join(lack)} 이 없거나 글이 아닙니다")
+            return 1
+        if not Path(item["file"]).resolve().is_relative_to(Path.cwd().resolve()):   # hook 이 지키는 곳 밖
+            print(f"거부 — 원문 파일이 블로그 폴더 밖에 있습니다: {item['file']}")
             return 1
         if not Path(item["file"]).is_file():
             print(f"거부 — 원문 파일이 없습니다: {item['file']}")

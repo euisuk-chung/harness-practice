@@ -23,7 +23,7 @@ steps:
     needs: [sources.json]
     output: draft.md
     next: check
-  check:                     # ③ 검사 다섯 — 거부하면 이유를 붙여 write 를 다시
+  check:                     # ③ 블로그 검사 — 거부하면 이유를 붙여 write 를 다시
     run: python steps/check.py draft.md sources.json
     next: approve
     on_reject: write

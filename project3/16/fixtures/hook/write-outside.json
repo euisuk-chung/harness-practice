@@ -1,0 +1,10 @@
+{
+  "cwd": ".",
+  "hook_event_name": "PreToolUse",
+  "agent_type": "news",
+  "tool_name": "Write",
+  "tool_input": {
+    "file_path": "research/../../notes.md",
+    "content": "메모"
+  }
+}

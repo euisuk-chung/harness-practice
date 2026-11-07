@@ -4,6 +4,7 @@
 
 posts/ 의 YYYY-MM-DD.md 하나가 글 한 편이다. 글마다 docs/YYYY-MM-DD.html 을 만들고,
 docs/index.html 에 최근 글부터 목록을 적는다. 글이 없으면 「아직 올라온 글이 없습니다.」만 적는다.
+posts/ 에서 지운 글의 docs/YYYY-MM-DD.html 은 지운다(index.html · .nojekyll 은 둔다).
 GitHub Pages 는 main 브랜치의 docs/ 폴더를 그대로 올린다(docs/.nojekyll — 다른 변환 없이 그대로).
 """
 import html
@@ -48,6 +49,9 @@ def main():
         head = text.strip().splitlines()[0].lstrip("# ").strip() if text.strip() else post.stem
         (DOCS / f"{post.stem}.html").write_text(page(head, markdown.markdown(text)), encoding="utf-8")
         items.append(f'<li>{post.stem} · <a href="{post.stem}.html">{html.escape(head)}</a></li>')
+    for old in DOCS.glob("*.html"):                # 원본 글이 없는 페이지는 지운다
+        if old.stem != "index" and not (POSTS / f"{old.stem}.md").exists():
+            old.unlink()
     body = "<ul>\n" + "\n".join(items) + "\n</ul>" if items else "<p>아직 올라온 글이 없습니다.</p>"
     (DOCS / "index.html").write_text(page(TITLE, body), encoding="utf-8")
     print(f"docs/index.html 을 만들었습니다 — 글 {len(posts)}편")

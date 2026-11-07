@@ -2,9 +2,9 @@
 
     uv run python steps/check.py draft.md sources.json
 
-1 구조       — status 세 줄 · 머리 한 줄 · 소식 · 주장 목록 · 뺀 소식이 정해진 모양인가
+1 구조       — status 세 줄 · 머리 한 줄 · 소식 · 주장 목록 · 뺀 소식이 정해진 모양이고, 소제목이 겹치지 않는가
 2 출처와 기간 — 원문 id · 원문 링크가 items 에 있고, 세 회사 공식 사이트이고, 게시일이 가져온 날이나 그 전날인가
-3 원문 대조   — 인용이 그 원문 파일에 글자 그대로 있고, 주장에 든 숫자가 인용에도 있는가
+3 원문 대조   — 인용이 비지 않고 그 원문 파일에 글자 그대로 있고, 주장에 든 숫자(부호까지)가 인용에도 있는가
 4 형식       — 소식마다 세 문장과 원문 링크 한 줄인가
 5 근거       — 소식의 문장마다 주장 목록에 주장으로 올라 있는가
 exit code — 0: 통과 · 1: 거부(이유를 찍는다 — runner 가 다시 쓰는 프롬프트에 붙인다)
@@ -18,8 +18,8 @@ from pathlib import Path
 from urllib.parse import urlparse
 
 OFFICIAL = {"blog.google", "www.anthropic.com", "openai.com"}
-SENTENCE = re.compile(r"(?<=[.!?])\s+")
-NUMBER = re.compile(r"\d+(?:[.,]\d+)*")
+SENTENCE = re.compile(r"(?<=[.!?])(?<!\.[A-Z]\.)\s+")
+NUMBER = re.compile(r"(?:(?<!\w)-)?\d+(?:[.,]\d+)*")
 
 
 def same(text):
@@ -41,6 +41,8 @@ def read_draft(text):
     for line in body[1:]:
         if line.startswith("## "):
             name = line[3:].strip()
+            if name in parts:
+                raise ValueError(f"같은 소제목이 두 번 있습니다: ## {name}")
             parts[name] = []
         elif name is None:
             raise ValueError(f"소제목 앞에 글이 있습니다: {line}")
@@ -106,6 +108,9 @@ def main(draft_path, sources_path):
         if sid not in items:
             continue
         quote = quote[1:-1] if quote[:1] == quote[-1:] == '"' else quote
+        if not same(quote):
+            why.append(f"[3 원문 대조] 인용이 비었습니다: {said}")
+            continue
         try:
             source = Path(items[sid]["file"]).read_text(encoding="utf-8")
         except OSError:
@@ -133,7 +138,7 @@ def main(draft_path, sources_path):
         print(f"거부 — {line}")
     if why:
         return 1
-    print(f"통과 — 다섯 검사 · 소식 {len(news)} · 주장 {len(claims)} · 뺀 소식 {len(left)}")
+    print(f"통과 — 블로그 검사 · 소식 {len(news)} · 주장 {len(claims)} · 뺀 소식 {len(left)}")
     return 0
 
 

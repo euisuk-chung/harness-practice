@@ -14,6 +14,9 @@
 | `project1/11` | 블로그에 검사 · 승인 단계를 더한 상태입니다. 초안을 다섯 가지로 검사하는 `steps/check.py`, 통과한 초안으로 PR 을 여는 `steps/approve.py`, 작성 → 검사만 있는 연습 graph(`examples/graph-retry.yaml`), 검사마다 거부되는 초안이 든 `fixtures/check/` 가 들어 있습니다. 이미 `~/my-blog` 가 있으면 더해지거나 바뀐 것만 복사합니다. 자세한 것은 그 폴더의 `README.md` 에 있습니다. |
 | `project1/12` | 블로그를 매일 아침 저절로 실행하게 한 상태입니다. GitHub Actions workflow(`examples/daily.yml` — 매일 한국 시간 07:00 · 손으로 실행 · 한 번에 하나만), 그날 이미 실행했으면 건너뛰고 runner 를 불러 운영 기록 `runs/<날짜>/log.jsonl` 을 남기는 `daily.py`, 빠진 기록을 찾는 `steps/audit.py` 가 들어 있습니다. hook 은 불릴 때마다 운영 기록에 한 줄을 남깁니다. 이미 `~/my-blog` 가 있으면 더해지거나 바뀐 것만 복사합니다. 자세한 것은 그 폴더의 `README.md` 에 있습니다. |
 | `project2/13` | 프로젝트 2 가계부의 시작 상태입니다. 영수증을 `inbox/` 에 넣으면 폴더 trigger(`watch.py`)가 runner 를 실행하고, Claude 가 가계부 정리 skill(`examples/SKILL.md` — `.claude/skills/ledger-rules/SKILL.md` 로 복사)의 기준대로 영수증을 읽습니다. `ledger.py` 가 기록 전에 형식을 검사해 통과한 것만 Excel 가계부 `ledger.xlsx` 에 한 줄 더하고, 나머지는 이유와 함께 `review/` 로 보냅니다. 지어낸 연습 영수증 셋(`receipts/`)이 들어 있습니다. 자세한 것은 그 폴더의 `README.md` 에 있습니다. |
+| `project2/14` | 가계부에 같은 영수증이 두 번 적히지 않게 한 상태입니다. 기록할 때 영수증 파일의 content hash 를 가계부 「content hash」 칸에 같이 적고, graph 에 같은 파일을 알아보는 `seen` 단계와 날짜 · 가게 · 금액으로 중복 의심 점수를 매기는 `dup` 단계(`dedup.py`, threshold 70)가 더해졌습니다. 정답이 표시된 연습 묶음(`practice/pairs.csv`)으로 threshold 를 바꿔 보는 `threshold.py`, 연습용 카드 명세서(`statements/2026-10.csv`)와 가계부를 맞춰 일치 · 누락 · 중복을 찾는 `reconcile.py`, 같은 영수증을 다시 찍은 사진 `receipts/r01-again.png` 이 들어 있습니다. 이미 `~/my-ledger` 가 있으면 더해지거나 바뀐 것만 복사합니다. 자세한 것은 그 폴더의 `README.md` 에 있습니다. |
+| `project3/15` | 프로젝트 3 여행 계획의 시작 상태입니다. `trip.yaml` 에 도시 · 날짜 · 내 이동 한도를 적고, 본 세션이 날씨 · 문화 · 뉴스 · 명소 subagent 넷(`examples/agents/` — `.claude/agents/` 로 복사)을 차례로 부르면 넷이 각자 웹에서 조사해 `research/<이름>.json` 에 남깁니다. 확인하지 못한 값은 「모름」 으로 적습니다. 경로 hook(`.claude/hooks/protect.py`, 설정은 `examples/settings.json`)이 쓰기를 `research/<이름>.json` 으로 좁히고 누가 어느 파일을 썼는지 `hook-log.jsonl` 에 남깁니다. 자세한 것은 그 폴더의 `README.md` 에 있습니다. |
+| `project3/16` | 여행 계획에 일정 짜기 · 검사 · 고르기를 더한 상태입니다. 일정 subagent(`examples/agents/planner.md` — `.claude/agents/` 로 복사)가 `research/*.json` 과 `trip.yaml` 을 읽어 일정 안 두세 개를 `plans/<번호>.json` 에 짜고, constraint check(`constraints.py`)가 날짜 · 운영 시간 · 하루 이동 한도 · 출처를 확인합니다. 거부되면 이유와 exit code 1, 거부는 없지만 확인 못 한 정보가 남으면 3 이고, 거부가 없으면 고를 칸 `choices.md` 를 씁니다. 고른 번호를 `choose.py <번호>` 로 넘기면 `plan.json` 으로 확정합니다. 경로 hook 은 planner 를 `plans/<번호>.json` 으로 좁힙니다. 가능한 일정 · 불가능한 일정 fixture(`fixtures/ok` · `fixtures/bad`)가 들어 있습니다. 이미 `~/my-trip` 이 있으면 더해지거나 바뀐 것만 복사합니다. 자세한 것은 그 폴더의 `README.md` 에 있습니다. |
 
 ## 받기와 실행
 
@@ -25,14 +28,14 @@ uv run python run.py fixtures/missing-when.json   # 저장해 둔 응답으로 �
 uv run python run.py                              # Claude Code 를 한 번 부릅니다 — 로그인이 필요합니다
 ```
 
-이미 받은 저장소는 맨 위 폴더에서 `git pull` 로 새 실습 폴더를 받습니다.
+한 번 받으면 모든 차시의 실습 폴더가 함께 들어 있습니다. 다음 차시부터는 새로 받지 않고, 받아 둔 저장소에서 그 차시의 폴더로 들어갑니다.
 
 ```bash
-cd ~/harness-practice
-git pull
-cd part2/06
+cd ~/harness-practice/part2/06
 uv sync
 uv run python .claude/hooks/protect.py < fixtures/write-sources.json   # hook 만 시험 — Claude 를 부르지 않습니다
 ```
+
+강사가 실습 파일을 고쳐 올린 것이 있으면 맨 위 폴더(`~/harness-practice`)에서 `git pull` 로 받습니다. 고친 것이 없으면 `Already up to date.` 한 줄이 찍힙니다.
 
 실행에 필요한 것은 uv 와 Claude Code(구독 계정으로 로그인)입니다. `run.py` 가 만드는 `response.json` 과 `uv sync` 가 만드는 `.venv`·`uv.lock` 은 저장소에 올리지 않습니다.
