@@ -5,7 +5,7 @@
 | 폴더 | 하는 일 |
 |---|---|
 | `demo/minutes` | 회의록 자동화 시연입니다. 녹취록을 `inbox/` 에 넣으면 회의록과 검사 보고가 나옵니다. 그 폴더에서 `./start.sh --replay` 로 Claude 를 부르지 않고 다시 볼 수 있습니다. 자세한 것은 그 폴더의 `README.md` 에 있습니다. |
-| `part1/03` | 업무를 구간으로 쪼개고 구간마다 맡길지, 얼마나 크게 맡길지 적는 워크시트입니다. `worksheet.md` 는 빈 양식이고, `worksheet-blog.md` 는 프로젝트 1 블로그 업무로 채운 예시입니다. 실행할 코드는 없습니다. |
+| `part1/03` | 업무를 구간으로 분해하고 구간마다 맡길지, 얼마나 크게 맡길지 적는 워크시트입니다. `worksheet.md` 는 빈 양식이고, `worksheet-blog.md` 는 프로젝트 1 블로그 업무로 채운 예시입니다. 실행할 코드는 없습니다. |
 | `part1/04` | 업무의 판단 기준을 끌어내 기준 문서 `criteria.md` 한 장으로 적는 프롬프트 셋입니다. 인터뷰(`interview-prompt.md`), 기준 문서로 옮기기(`criteria-prompt.md`), 기준 문서만 보고 판단하기(`check-prompt.md`)를 차례로 Claude 대화 창에 붙여 넣습니다. 프로젝트 1 블로그로 만든 기준 문서 `criteria-blog.md`, 확인에 쓴 지난 사례 `check-cases-blog.md`, 그 대화를 고치지 않고 옮긴 기록 `blog-run-log.md` 가 함께 들어 있습니다. 실행할 코드는 없습니다. |
 | `part2/05` | Claude Code 를 `claude -p` 로 한 번 부르고, 답이 `schema.json` 의 형식을 지켰는지 검증합니다. 지켰으면 exit code 0, 어겼으면 1 로 끝납니다. |
 | `part2/06` | `sources/` 의 원문을 고치지 못하게 막는 PreToolUse hook(`.claude/hooks/protect.py`)과 permissions 설정 예시입니다. hook 은 막을 때 exit code 2 로 끝납니다. |
