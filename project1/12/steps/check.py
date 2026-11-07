@@ -1,4 +1,4 @@
-"""검사 단계 — 초안 draft.md 를 수집 결과 sources.json 과 원문 파일에 맞대 다섯 가지를 본다.
+"""검사 단계 — 초안 draft.md 를 수집 결과 sources.json 과 원문 파일과 비교해 다섯 가지를 본다.
 
     uv run python steps/check.py draft.md sources.json
 
