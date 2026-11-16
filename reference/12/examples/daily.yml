@@ -1,7 +1,8 @@
 # 프로젝트 1 — 매일 아침 7시(한국 시간)에 블로그 graph 를 실행하는 workflow
 # 저장소 맨 위의 .github/workflows/blog-daily.yml 로 복사해 GitHub 에 올리면, PC 가 꺼져 있어도 GitHub 의 컴퓨터가 실행한다.
 # GitHub 는 저장소 맨 위의 .github/workflows/ 만 읽는다. 명령은 모두 projects/blog 에서 실행한다(defaults.run.working-directory).
-# fork 한 저장소는 Actions 와 예약 실행이 꺼진 채로 시작한다 — 12차시에 내 저장소의 Actions 화면에서 켠다.
+# 강사 저장소에는 workflow 가 없어 fork 직후 Actions 를 켤 버튼이 보이지 않을 수 있다(2026-11-16 실측 — 올린 뒤 바로 active).
+# 올린 뒤 gh workflow list 로 active 인지 보고, Actions 화면에 켜기 버튼이 보이면 누른다.
 name: blog-daily
 
 on:
