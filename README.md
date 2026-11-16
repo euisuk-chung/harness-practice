@@ -26,13 +26,13 @@
 
 ```bash
 cd ~
-gh repo fork https://github.com/euisuk-chung/harness-practice.git --clone
+gh repo fork https://github.com/kr-harness-lab/harness-practice.git --clone
 cd harness-practice
 git remote -v                                       # origin = 내 fork, upstream = 강사 저장소
 gh repo set-default <아이디>/harness-practice       # gh 가 강사 저장소가 아니라 내 저장소를 보게
 ```
 
-gh 없이 받으려면 GitHub 화면에서 Fork 를 누른 뒤 `git clone https://github.com/<아이디>/harness-practice.git` 로 받고, `git remote add upstream https://github.com/euisuk-chung/harness-practice.git` 을 실행합니다.
+gh 없이 받으려면 GitHub 화면에서 Fork 를 누른 뒤 `git clone https://github.com/<아이디>/harness-practice.git` 로 받고, `git remote add upstream https://github.com/kr-harness-lab/harness-practice.git` 을 실행합니다.
 fork 한 저장소는 공개입니다. 내 가계부 · 영수증 · 개인 자료는 커밋하지 않습니다 — 프로젝트 폴더의 `.gitignore` 가 가계부와 영수증을 가리지만, 커밋하기 전에 `git status` 로 올라갈 파일을 확인합니다.
 
 ## 실행
