@@ -9,10 +9,12 @@
 4. 주장 목록 · 뺀 소식을 본문에 담아 main 으로 가는 PR 을 연다 — origin(내 저장소)에. fork 라도 강사 저장소로 열리지 않게
    gh 에 --repo <내 아이디>/<저장소> 를 늘 붙인다
 5. needs_approval 을 찍고 exit code 3 — runner 가 human queue 에 남기고 멈춘다
+<오늘> 은 daily.py 가 넘기는 run ID(환경 변수 RUN_ID)다. 없으면(daily.py 없이 실행) 이 컴퓨터의 오늘 날짜를 쓴다.
 게시는 이 단계가 하지 않는다. 내가 PR 을 읽고 합치면 GitHub Pages 가 main 의 docs/ 를 올린다.
 exit code — 3: 사람 차례(PR 을 열었다 · 열지 못했다)
 1 보다 먼저 gh · origin · 지금 branch(main) · 미리 staged 된 파일을 보고, 어긋나면 아무것도 바꾸지 않고 3
 """
+import os
 import re
 import shutil
 import subprocess
@@ -74,7 +76,7 @@ def check():
 
 
 def main(draft_path):
-    today = date.today().isoformat()
+    today = os.environ.get("RUN_ID") or date.today().isoformat()   # 자정을 넘겨도 실행을 시작한 날의 날짜
     branch, committed, repo = BRANCH.format(today), False, "<내 아이디>/<저장소>"
     post, claims, left = split(Path(draft_path).read_text(encoding="utf-8"))
     head = post.splitlines()[0].lstrip("# ").strip()
