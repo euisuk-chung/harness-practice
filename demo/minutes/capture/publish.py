@@ -55,8 +55,9 @@ def main() -> int:
         print(f"넣지 않음: 전사 상태 {tr.get('status')}", file=sys.stderr)
         return 1
     marks = ("hard_cut", "suspect_repeat", "prompt_echo")     # 원음을 다시 들어 볼 곳
+    # 받아 적은 글이 있는 조각만 — 무음 조각은 쉼이 없어 hard_cut 이 붙어도 들어 볼 말이 없다(2026-11-16 실측: 네 곳 중 셋이 무음)
     flags = [f"{hms(s['start'])} " + ",".join(k for k in marks if s.get(k))
-             for s in tr["segments"] if any(s.get(k) for k in marks)]
+             for s in tr["segments"] if s.get("text") and any(s.get(k) for k in marks)]
     job_file = a.job / "job.json"
     job = json.loads(job_file.read_text(encoding="utf-8")) if job_file.exists() else {}
     if job.get("published") and not a.again:

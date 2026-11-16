@@ -4,7 +4,7 @@
 
 1 구조       — status 세 줄 · 머리 한 줄 · 소식 · 주장 목록 · 뺀 소식이 정해진 모양이고, 소제목이 겹치지 않는가
 2 출처와 기간 — 원문 id · 원문 링크가 items 에 있고, 세 회사 공식 사이트이고, 게시일이 가져온 날이나 그 전날인가
-3 원문 대조   — 인용이 비지 않고 그 원문 파일에 글자 그대로 있고, 주장에 든 숫자(부호까지)가 인용에도 있는가
+3 원문 대조   — 인용이 비지 않고 그 원문 파일의 글(수집 단계가 적은 머리 세 줄은 빼고)에 글자 그대로 있고, 주장에 든 숫자(부호까지)가 인용에도 있는가
 4 형식       — 소식마다 세 문장과 원문 링크 한 줄인가
 5 근거       — 소식의 문장마다 주장 목록에 주장으로 올라 있는가
 exit code — 0: 통과 · 1: 거부(이유를 찍는다 — runner 가 다시 쓰는 프롬프트에 붙인다)
@@ -20,6 +20,17 @@ from urllib.parse import urlparse
 OFFICIAL = {"blog.google", "www.anthropic.com", "openai.com"}
 SENTENCE = re.compile(r"(?<=[.!?])(?<!\.[A-Z]\.)\s+")
 NUMBER = re.compile(r"(?:(?<!\w)-)?\d+(?:[.,]\d+)*")
+
+
+HEADER = re.compile(r"^(?:주소|게시일|가져온 날짜):.*$")
+
+
+def body(source):
+    """원문 파일에서 수집 단계가 맨 위에 적은 머리 줄(주소 · 게시일 · 가져온 날짜)을 뗀다 — 그 줄은 원문 글이 아니다."""
+    lines = source.splitlines()
+    while lines and HEADER.match(lines[0]):
+        lines.pop(0)
+    return "\n".join(lines)
 
 
 def same(text):
@@ -116,8 +127,11 @@ def main(draft_path, sources_path):
         except OSError:
             why.append(f"[3 원문 대조] 원문 파일 {items[sid]['file']} 을 열지 못했습니다")
             continue
-        if same(quote) not in same(source):
-            why.append(f"[3 원문 대조] 인용이 원문 파일 {sid} 에 없습니다: \"{quote}\"")
+        if same(quote) not in same(body(source)):
+            if same(quote) in same(source):
+                why.append(f"[3 원문 대조] 인용이 원문 파일 {sid} 의 머리 줄입니다 — 원문 글에서 인용합니다: \"{quote}\"")
+            else:
+                why.append(f"[3 원문 대조] 인용이 원문 파일 {sid} 에 없습니다: \"{quote}\"")
         quoted = {n.replace(",", "") for n in NUMBER.findall(quote)}
         for num in NUMBER.findall(said):
             if num.replace(",", "") not in quoted:
