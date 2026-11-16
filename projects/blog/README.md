@@ -71,7 +71,7 @@ git commit -m "블로그 매일 실행"
 git push
 ```
 
-5. fork 한 저장소는 Actions 와 예약 실행이 꺼진 채로 시작한다. 내 저장소의 Actions 탭에서 workflow 를 켜는 버튼을 누르고, `gh workflow enable blog-daily.yml --repo <아이디>/harness-practice` 로 이 workflow 를 켠다. 이때부터 매일 UTC 22:00 에 실행된다
+5. `gh workflow list --repo <아이디>/harness-practice` 로 `blog-daily` 가 `active` 인지 본다(올린 직후에는 몇십 초 뒤에 보인다). 꺼져 있거나 Actions 탭에 켜기 버튼이 보이면 그 버튼을 누르고 `gh workflow enable blog-daily.yml --repo <아이디>/harness-practice` 로 켠다. 이때부터 매일 UTC 22:00 에 실행된다
 6. `gh workflow run blog-daily.yml --repo <아이디>/harness-practice` 로 손으로 한 번 실행하고, `gh run list --workflow blog-daily.yml --repo <아이디>/harness-practice` 로 결과를 본다
 
 멈추려면 `gh workflow disable blog-daily.yml --repo <아이디>/harness-practice` 를 실행합니다. 토큰은 Git 에 올리지 않습니다.
