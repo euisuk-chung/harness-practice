@@ -1,0 +1,11 @@
+{
+  "cwd": ".",
+  "hook_event_name": "PreToolUse",
+  "agent_type": "sights",
+  "tool_name": "Edit",
+  "tool_input": {
+    "file_path": "trip.yaml",
+    "old_string": "move_limit_minutes: 90",
+    "new_string": "move_limit_minutes: 300"
+  }
+}

@@ -60,7 +60,7 @@ def rid_of(out: str) -> str:
 def main() -> int:
     with tempfile.TemporaryDirectory(prefix="minutes-") as t:
         root = Path(t) / "minutes"
-        shutil.copytree(SRC, root, ignore=shutil.ignore_patterns("requests", "minutes", "inbox", "__pycache__"))
+        shutil.copytree(SRC, root, ignore=shutil.ignore_patterns("requests", "minutes", "inbox", "__pycache__", "jobs", ".profile", ".venv"))
 
         # ── 장면 2·3: 녹취록 A — 검수 통과, 회의록과 보고
         code, out = run(root, ["python3", "scripts/open_request.py", "samples/transcript-a.txt"])
@@ -176,6 +176,15 @@ def main() -> int:
         rv = review_only(dict(d, attendees=[a for a in d["attendees"] if a != "정하늘"]))
         ok(rv["M3"]["problems"] == ["roster member '정하늘' missing from attendees"],
            f"M3: 명단에 있는데 참석자에서 빠지면 거부 ({rv['M3']['problems']})")
+        # 녹음을 받아 적은 녹취록(capture/) — 화자가 모두 '미확인'
+        sys.path.insert(0, str(root))
+        from checks import m3_attendees as m3
+        roster = ["김지현", "박도윤"]
+        ok(m3.check({"attendees": roster}, ["미확인"], roster) == []
+           and m3.notes({"attendees": roster}, ["미확인"], roster)[0].startswith("speakers are unknown"),
+           "M3: 화자가 '미확인' 뿐이면 참석자는 명단으로만 — 통과, 사람이 볼 메모 한 줄")
+        ok(m3.check({"attendees": roster + ["미확인"]}, ["미확인"], roster) == ["attendee '미확인' is not a person — speaker unknown"],
+           "M3: '미확인' 을 참석자에 넣으면 거부")
         rv = review_only(dict(d, carryover=d["carryover"][:2]))
         ok(not rv["M4"]["pass"] and any("previous minutes have 3" in x for x in rv["M4"]["problems"]),
            f"M4: 지난 할 일을 빼면 거부 ({rv['M4']['problems'][:1]})")

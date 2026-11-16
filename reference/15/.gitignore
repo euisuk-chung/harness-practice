@@ -1,0 +1,3 @@
+hook-log.jsonl
+research/*
+!research/.gitkeep

@@ -1,0 +1,19 @@
+state.json
+human_queue/
+entry.json
+current.txt
+ledger.xlsx
+done/
+inbox/*
+!inbox/.gitkeep
+review/*
+!review/.gitkeep
+# 내 영수증 · 카드 명세서는 Git 에 올리지 않는다 — fork 한 저장소는 공개라 올리면 누구나 본다.
+# 실린 것은 지어낸 연습 파일뿐이다(아래 ! 줄)
+receipts/*
+!receipts/r01.png
+!receipts/r02.png
+!receipts/r03.png
+!receipts/r01-again.png
+statements/*
+!statements/2026-10.csv

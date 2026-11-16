@@ -11,20 +11,34 @@
 | `part2/06` | `sources/` 의 원문을 고치지 못하게 막는 PreToolUse hook(`.claude/hooks/protect.py`)과 permissions 설정 예시입니다. hook 은 막을 때 exit code 2 로 끝납니다. |
 | `part2/07` | 중고 판매 글을 규칙으로 검사하는 `check.py` 와 Claude 가 판정하는 `judge.md`, 정답을 붙인 판매 글 열 건(`golden/`)으로 검사를 재는 `eval.py` 입니다. 검사를 고친 뒤 전에 맞히던 판정이 틀리면 exit code 1 로 끝납니다. |
 | `part2/08` | `graph.yaml` 을 읽어 단계를 차례로 실행하는 `runner.py` 와 환불 요청 문자를 검사하는 `check.py` 입니다. 거부되면 이유를 붙여 다시 쓰고, `max_attempts` 를 넘기거나 입력·권한이 막히면 `human_queue/` 에 남기고 exit code 3 으로 끝납니다. 단계가 exit code 4(할 일 없음)로 끝나면 남은 단계를 건너뛰고 exit code 0 으로 끝납니다. 멈췄다 다시 실행하면 `state.json` 의 멈춘 자리부터 다시 실행합니다. `--answer fixtures/…` 로 Claude 를 부르지 않고 시험할 수 있습니다. |
-| `project1/09` | 프로젝트 1 블로그의 시작 저장소입니다. `project1` 아래 번호 폴더마다 그 차시 시작 상태 전체가 들어 있습니다. 이 폴더를 복사해 내 GitHub 계정의 새 저장소로 올리고 GitHub Pages 로 빈 블로그를 엽니다. `make_site.py` 가 `posts/` 의 글로 `docs/` 를 만들고, `examples/` 에 계획서 `PLAN.md`·graph 초안·`CLAUDE.md` 가 있습니다. 자세한 것은 그 폴더의 `README.md` 에 있습니다. |
-| `project1/10` | 블로그에 수집 · 작성 단계를 더한 상태입니다. `prompts/` 의 수집 · 작성 프롬프트, 수집 결과를 세는 `steps/count.py`, 수집 단계만 `runs/<날짜>/sources/` 에 쓰게 하는 hook(`.claude/hooks/protect.py`), Claude 를 부르지 않고 시험하는 `fixtures/` 가 들어 있습니다. 이미 `~/my-blog` 가 있으면 더해지거나 바뀐 것만 복사합니다. 자세한 것은 그 폴더의 `README.md` 에 있습니다. |
-| `project1/11` | 블로그에 검사 · 승인 단계를 더한 상태입니다. 초안을 다섯 가지로 검사하는 `steps/check.py`, 통과한 초안으로 PR 을 여는 `steps/approve.py`, 작성 → 검사만 있는 연습 graph(`examples/graph-retry.yaml`), 검사마다 거부되는 초안이 든 `fixtures/check/` 가 들어 있습니다. 이미 `~/my-blog` 가 있으면 더해지거나 바뀐 것만 복사합니다. 자세한 것은 그 폴더의 `README.md` 에 있습니다. |
-| `project1/12` | 블로그를 매일 아침 저절로 실행하게 한 상태입니다. GitHub Actions workflow(`examples/daily.yml` — 매일 한국 시간 07:00 · 손으로 실행 · 한 번에 하나만), 그날 이미 실행했으면 건너뛰고 runner 를 불러 운영 기록 `runs/<날짜>/log.jsonl` 을 남기는 `daily.py`, 빠진 기록을 찾는 `steps/audit.py` 가 들어 있습니다. hook 은 불릴 때마다 운영 기록에 한 줄을 남깁니다. 이미 `~/my-blog` 가 있으면 더해지거나 바뀐 것만 복사합니다. 자세한 것은 그 폴더의 `README.md` 에 있습니다. |
-| `project2/13` | 프로젝트 2 가계부의 시작 상태입니다. 영수증을 `inbox/` 에 넣으면 폴더 trigger(`watch.py`)가 runner 를 실행하고, Claude 가 가계부 정리 skill(`examples/SKILL.md` — `.claude/skills/ledger-rules/SKILL.md` 로 복사)의 기준대로 영수증을 읽습니다. `ledger.py` 가 기록 전에 형식을 검사해 통과한 것만 Excel 가계부 `ledger.xlsx` 에 한 줄 더하고, 나머지는 이유와 함께 `review/` 로 보냅니다. 지어낸 연습 영수증 셋(`receipts/`)이 들어 있습니다. 자세한 것은 그 폴더의 `README.md` 에 있습니다. |
-| `project2/14` | 가계부에 같은 영수증이 두 번 적히지 않게 한 상태입니다. 기록할 때 영수증 파일의 content hash 를 가계부 「content hash」 칸에 같이 적고, graph 에 같은 파일을 알아보는 `seen` 단계와 날짜 · 가게 · 금액으로 중복 의심 점수를 매기는 `dup` 단계(`dedup.py`, threshold 70)가 더해졌습니다. 정답이 표시된 연습 묶음(`practice/pairs.csv`)으로 threshold 를 바꿔 보는 `threshold.py`, 연습용 카드 명세서(`statements/2026-10.csv`)와 가계부를 맞춰 일치 · 누락 · 중복을 찾는 `reconcile.py`, 같은 영수증을 다시 찍은 사진 `receipts/r01-again.png` 이 들어 있습니다. 이미 `~/my-ledger` 가 있으면 더해지거나 바뀐 것만 복사합니다. 자세한 것은 그 폴더의 `README.md` 에 있습니다. |
-| `project3/15` | 프로젝트 3 여행 계획의 시작 상태입니다. `trip.yaml` 에 도시 · 날짜 · 내 이동 한도를 적고, 본 세션이 날씨 · 문화 · 뉴스 · 명소 subagent 넷(`examples/agents/` — `.claude/agents/` 로 복사)을 차례로 부르면 넷이 각자 웹에서 조사해 `research/<이름>.json` 에 남깁니다. 확인하지 못한 값은 「모름」 으로 적습니다. 경로 hook(`.claude/hooks/protect.py`, 설정은 `examples/settings.json`)이 쓰기를 `research/<이름>.json` 으로 좁히고 누가 어느 파일을 썼는지 `hook-log.jsonl` 에 남깁니다. 자세한 것은 그 폴더의 `README.md` 에 있습니다. |
-| `project3/16` | 여행 계획에 일정 짜기 · 검사 · 고르기를 더한 상태입니다. 일정 subagent(`examples/agents/planner.md` — `.claude/agents/` 로 복사)가 `research/*.json` 과 `trip.yaml` 을 읽어 일정 안 두세 개를 `plans/<번호>.json` 에 짜고, constraint check(`constraints.py`)가 날짜 · 운영 시간 · 하루 이동 한도 · 출처를 확인합니다. 거부되면 이유와 exit code 1, 거부는 없지만 확인 못 한 정보가 남으면 3 이고, 거부가 없으면 고를 칸 `choices.md` 를 씁니다. 고른 번호를 `choose.py <번호>` 로 넘기면 `plan.json` 으로 확정합니다. 경로 hook 은 planner 를 `plans/<번호>.json` 으로 좁힙니다. 가능한 일정 · 불가능한 일정 fixture(`fixtures/ok` · `fixtures/bad`)가 들어 있습니다. 이미 `~/my-trip` 이 있으면 더해지거나 바뀐 것만 복사합니다. 자세한 것은 그 폴더의 `README.md` 에 있습니다. |
+| `projects/blog` | 프로젝트 1 블로그의 작업 폴더입니다. 시작 상태는 `reference/09` 와 같고, 9~12차시 내내 이 폴더 하나에서 이어 만듭니다. `make_site.py` 가 `posts/` 의 글로 저장소 맨 위 `docs/` 를 만듭니다. 자세한 것은 그 폴더의 `README.md` 에 있습니다. |
+| `projects/ledger` | 프로젝트 2 가계부의 작업 폴더입니다. 시작 상태는 `reference/13` 과 같고, 13~14차시에 이 폴더에서 이어 만듭니다. 가계부 `ledger.xlsx` 와 내 영수증 · 카드 명세서는 `.gitignore` 가 가려 Git 에 올라가지 않습니다. |
+| `projects/trip` | 프로젝트 3 여행 계획의 작업 폴더입니다. 시작 상태는 `reference/15` 와 같고, 15~16차시에 이 폴더에서 이어 만듭니다. |
+| `reference/09` … `reference/12` | 블로그의 차시별 시작 상태입니다(보기만 하는 폴더). 10 은 수집 · 작성 단계와 hook, 11 은 검사 · 승인(PR) 단계, 12 는 매일 아침 실행하는 GitHub Actions workflow(`examples/daily.yml`) · `daily.py` · 운영 기록 점검 `steps/audit.py` 를 더합니다. |
+| `reference/13` · `reference/14` | 가계부의 차시별 시작 상태입니다. 13 은 영수증을 `inbox/` 에 넣으면 skill 의 기준대로 읽어 형식 검사를 거쳐 `ledger.xlsx` 에 한 줄 더하고, 14 는 같은 영수증을 두 번 적지 않게 하는 `seen` · `dup` 단계와 카드 명세서 맞추기 `reconcile.py` 를 더합니다. |
+| `reference/15` · `reference/16` | 여행 계획의 차시별 시작 상태입니다. 15 는 조사 subagent 넷과 경로 hook, 16 은 일정 subagent(planner) · constraint check `constraints.py` · 고르기 `choose.py` 를 더합니다. |
+| `tools/advance.py` | 차시를 넘길 때 그 차시의 강사 파일을 작업 폴더로 가져옵니다. 내가 고친 파일은 덮어쓰지 않고, 강사도 바꾼 파일이면 차이를 보이고 아무것도 바꾸지 않은 채 멈춥니다(exit code 1). |
+| `docs` | 블로그 페이지입니다. GitHub Pages 가 main 의 `/docs` 를 올립니다. `projects/blog` 의 `make_site.py` 만 이 폴더를 고칩니다. |
 
-## 받기와 실행
+## 받기 — 내 GitHub 계정으로 fork
+
+이 저장소를 내 GitHub 계정으로 fork 해 받습니다. 16차시까지 이 저장소 하나에서 실습하고, 블로그 · 가계부 · 여행 계획도 저장소 안의 `projects/` 에서 만듭니다 — 새 저장소를 만들거나 폴더를 밖으로 복사하지 않습니다.
 
 ```bash
-git clone https://github.com/euisuk-chung/harness-practice.git
-cd harness-practice/part2/05
+cd ~
+gh repo fork https://github.com/euisuk-chung/harness-practice.git --clone
+cd harness-practice
+git remote -v                                       # origin = 내 fork, upstream = 강사 저장소
+gh repo set-default <아이디>/harness-practice       # gh 가 강사 저장소가 아니라 내 저장소를 보게
+```
+
+gh 없이 받으려면 GitHub 화면에서 Fork 를 누른 뒤 `git clone https://github.com/<아이디>/harness-practice.git` 로 받고, `git remote add upstream https://github.com/euisuk-chung/harness-practice.git` 을 실행합니다.
+fork 한 저장소는 공개입니다. 내 가계부 · 영수증 · 개인 자료는 커밋하지 않습니다 — 프로젝트 폴더의 `.gitignore` 가 가계부와 영수증을 가리지만, 커밋하기 전에 `git status` 로 올라갈 파일을 확인합니다.
+
+## 실행
+
+```bash
+cd ~/harness-practice/part2/05
 uv sync
 uv run python run.py fixtures/missing-when.json   # 저장해 둔 응답으로 검증만 — Claude 를 부르지 않습니다
 uv run python run.py                              # Claude Code 를 한 번 부릅니다 — 로그인이 필요합니다
@@ -38,6 +52,23 @@ uv sync
 uv run python .claude/hooks/protect.py < fixtures/write-sources.json   # hook 만 시험 — Claude 를 부르지 않습니다
 ```
 
-강사가 실습 파일을 고쳐 올린 것이 있으면 맨 위 폴더(`~/harness-practice`)에서 `git pull` 로 받습니다. 고친 것이 없으면 `Already up to date.` 한 줄이 찍힙니다.
+프로젝트는 차시가 바뀌어도 같은 작업 폴더에서 이어 합니다. 차시를 넘길 때는 그 프로젝트 폴더에서 `tools/advance.py` 로 그 차시의 강사 파일을 가져옵니다.
 
-실행에 필요한 것은 uv 와 Claude Code(구독 계정으로 로그인)입니다. `run.py` 가 만드는 `response.json` 과 `uv sync` 가 만드는 `.venv`·`uv.lock` 은 저장소에 올리지 않습니다.
+```bash
+cd ~/harness-practice/projects/blog
+uv run python ../../tools/advance.py blog 10      # reference/10 에서 더해지거나 바뀐 파일만 — 내가 고친 파일은 그대로
+```
+
+## 강사가 고친 것 받기
+
+강사가 실습 파일을 고쳐 올린 것이 있으면 맨 위 폴더에서 강사 저장소(upstream)의 main 을 합쳐 받고, 내 저장소에도 올립니다. 고친 것이 없으면 `Already up to date.` 한 줄이 찍힙니다.
+
+```bash
+cd ~/harness-practice
+git pull --no-rebase --no-edit upstream main
+git push
+```
+
+`reset --hard` 나 강사 main 으로 덮어쓰는 명령은 쓰지 않습니다 — 내 작업 폴더의 글 · 가계부 · 여행 계획이 지워집니다. 강사가 고친 차시 파일은 `reference/` 에 들어오고, 작업 폴더에는 `tools/advance.py` 가 가져옵니다.
+
+실행에 필요한 것은 uv 와 Claude Code(구독 계정으로 로그인), GitHub CLI(`gh`)입니다. `run.py` 가 만드는 `response.json` 과 `uv sync` 가 만드는 `.venv`·`uv.lock` 은 저장소에 올리지 않습니다.

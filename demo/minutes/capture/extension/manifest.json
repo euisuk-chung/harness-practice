@@ -1,0 +1,10 @@
+{
+  "manifest_version": 3,
+  "name": "회의 녹음 (harness 실습)",
+  "version": "0.1.1",
+  "description": "지금 탭의 회의 소리를 이 PC 의 로컬 수신기(127.0.0.1:8765)로 보낸다. 아이콘을 누르면 시작, 다시 누르면 멈춘다.",
+  "permissions": ["tabCapture", "offscreen", "activeTab"],
+  "host_permissions": ["http://127.0.0.1:8765/*"],
+  "background": { "service_worker": "background.js" },
+  "action": { "default_title": "회의 녹음 시작" }
+}

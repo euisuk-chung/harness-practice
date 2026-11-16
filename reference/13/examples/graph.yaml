@@ -1,0 +1,15 @@
+# 프로젝트 2 graph — 영수증 한 장을 가계부 한 줄로
+# ① 넣을 때마다 저절로 → graph 밖에서 watch.py 가 inbox/ 의 새 영수증마다 runner 를 부른다
+
+start: read
+
+steps:
+  read:                      # ② ⑥ ledger-rules skill 의 기준대로 읽어 JSON 한 줄 · ④ 못 읽은 칸은 비우고 이유
+    claude: prompts/read.md
+    args: ["--disallowedTools", "Bash,Write,Edit,WebSearch,WebFetch"]
+    output: entry.json
+    next: add
+  add:                       # ② 기록 전 형식 검사 — 통과 0 이면 ledger.xlsx 에 한 줄, 아니면 exit code 3 으로 사람에게
+    run: python ledger.py add entry.json
+    needs: [entry.json]
+    next: end

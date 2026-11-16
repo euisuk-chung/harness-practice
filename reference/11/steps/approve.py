@@ -1,0 +1,112 @@
+"""승인 단계 — 검사를 통과한 초안으로 PR 을 열고, 내 승인을 기다린다.
+
+    uv run python steps/approve.py draft.md
+
+1. 초안에서 status 세 줄 · 주장 목록 · 뺀 소식을 떼고, 글만 posts/<오늘>.md 로 쓴다
+2. make_site.py 로 저장소 맨 위 docs/ 를 다시 만든다
+3. 새 branch blog/draft/<오늘> 에 블로그의 posts · runs(projects/blog 안)와 저장소 맨 위 docs 만 커밋하고 GitHub 에 push 한다.
+   같은 저장소의 다른 실습(part2 · projects/ledger · projects/trip …)에서 고친 것은 커밋에 넣지 않는다
+4. 주장 목록 · 뺀 소식을 본문에 담아 main 으로 가는 PR 을 연다 — origin(내 저장소)에. fork 라도 강사 저장소로 열리지 않게
+   gh 에 --repo <내 아이디>/<저장소> 를 늘 붙인다
+5. needs_approval 을 찍고 exit code 3 — runner 가 human queue 에 남기고 멈춘다
+게시는 이 단계가 하지 않는다. 내가 PR 을 읽고 합치면 GitHub Pages 가 main 의 docs/ 를 올린다.
+exit code — 3: 사람 차례(PR 을 열었다 · 열지 못했다)
+1 보다 먼저 gh · origin · 지금 branch(main) · 미리 staged 된 파일을 보고, 어긋나면 아무것도 바꾸지 않고 3
+"""
+import re
+import shutil
+import subprocess
+import sys
+from datetime import date
+from pathlib import Path
+
+BLOG = Path(__file__).resolve().parents[1]        # 프로젝트 폴더 — projects/blog
+BODY = BLOG / "pr-body.md"
+BRANCH = "blog/draft/{}"                          # daily.py 도 이 이름으로 그날 실행했는지 본다
+
+
+def split(text):
+    """초안을 글 · 주장 목록 · 뺀 소식으로 나눈다. 검사를 통과한 초안이라 모양은 정해져 있다."""
+    body = text.split("\n---\n", 1)[1]
+    post, rest = body.split("\n## 주장 목록\n", 1)
+    claims, left = rest.split("\n## 뺀 소식\n", 1)
+    return post.strip() + "\n", claims.strip(), left.strip()
+
+
+def run(*args):
+    """명령 하나를 블로그 폴더에서 실행하고, 실패하면 이유를 담아 멈춘다."""
+    try:
+        done = subprocess.run(args, cwd=BLOG, capture_output=True, text=True, encoding="utf-8")
+    except OSError as e:                           # 명령이 아예 없다
+        raise RuntimeError(f"{args[0]} 를 실행하지 못했습니다 — {e}")
+    if done.returncode != 0:
+        raise RuntimeError(f"{' '.join(args[:3])} — {(done.stderr or done.stdout).strip()[-300:]}")
+    return done.stdout.strip()
+
+
+def own_repo():
+    """origin 의 주소에서 <아이디>/<저장소> 를 읽는다 — PR 을 열고 찾는 곳은 늘 여기다(fork 의 upstream 이 아니다)."""
+    try:
+        url = run("git", "config", "--get", "remote.origin.url")
+    except RuntimeError:
+        raise RuntimeError("origin 이 없습니다 — GitHub 의 내 저장소(fork)를 받은 폴더에서 실행합니다")
+    found = re.search(r"github\.com[:/]([^/\s]+/[^/\s]+?)(?:\.git)?/?$", url)
+    if not found:
+        raise RuntimeError(f"origin 이 GitHub 저장소 주소가 아닙니다: {url}")
+    return found[1]
+
+
+def check():
+    """아무것도 바꾸기 전에 본다 — 하나라도 어긋나면 이유를 담아 멈춘다. 저장소 맨 위 폴더를 돌려준다."""
+    if shutil.which("gh") is None:
+        raise RuntimeError("gh 가 없습니다 — GitHub CLI 를 설치하고 gh auth login 으로 로그인합니다")
+    root = Path(run("git", "rev-parse", "--show-toplevel")).resolve()
+    if BLOG != root / "projects" / "blog":
+        raise RuntimeError(f"projects/blog 에서 실행합니다 — 여기는 {BLOG} 입니다")
+    own_repo()
+    branch = run("git", "branch", "--show-current")
+    if branch != "main":                           # 새 branch 는 main 에서 갈라야 다른 실습의 커밋이 PR 에 끼지 않는다
+        raise RuntimeError(f"지금 branch 가 main 이 아닙니다({branch or '없음'}) — git switch main 으로 돌아옵니다")
+    staged = run("git", "diff", "--cached", "--name-only")
+    if staged:                                     # 그대로 두면 승인 커밋에 섞인다
+        raise RuntimeError(f"미리 staged 된 파일이 있습니다({', '.join(staged.splitlines())}) — git restore --staged 로 내립니다")
+    return root
+
+
+def main(draft_path):
+    today = date.today().isoformat()
+    branch, committed, repo = BRANCH.format(today), False, "<내 아이디>/<저장소>"
+    post, claims, left = split(Path(draft_path).read_text(encoding="utf-8"))
+    head = post.splitlines()[0].lstrip("# ").strip()
+    BODY.write_text(
+        "블로그 검사(구조 · 출처와 기간 · 원문 대조 · 형식 · 근거)를 통과한 초안입니다.\n\n"
+        "검사가 보지 않은 것 — 합치기 전에 사람이 봅니다\n"
+        "- 주장과 인용이 같은 뜻인가\n- 뺀 소식이 맞게 빠졌는가\n- 원문 자체가 사실인가\n\n"
+        f"## 주장 목록\n\n{claims}\n\n## 뺀 소식\n\n{left}\n", encoding="utf-8")
+    try:
+        root = check()                             # 실패하면 아무것도 바꾸지 않고 3
+        repo = own_repo()
+        (BLOG / "posts").mkdir(exist_ok=True)
+        (BLOG / "posts" / f"{today}.md").write_text(post, encoding="utf-8")
+        run(sys.executable, "make_site.py")
+        run("git", "switch", "-c", branch)
+        # 블로그의 posts · runs 와 저장소 맨 위 docs 만 — 같은 저장소의 다른 실습 변경은 넣지 않는다
+        run("git", "add", "--", *[str(p) for p in (BLOG / "posts", BLOG / "runs", root / "docs") if p.exists()])
+        run("git", "commit", "-m", f"{today} 소식 초안")
+        committed = True                           # 여기부터 실패하면 draft branch 에 머문다
+        run("git", "push", "-u", "origin", branch)
+        url = run("gh", "pr", "create", "--repo", repo, "--base", "main", "--head", branch,
+                  "--title", head, "--body-file", str(BODY))
+        run("git", "switch", "main")
+    except RuntimeError as e:
+        print(f"PR 을 열지 못했습니다 — {e}")
+        if committed:
+            print(f"남은 일 — 원인을 고친 뒤 이 branch 에서 git push -u origin {branch} · gh pr create --repo {repo}"
+                  f" --base main --head {branch} --title \"{head}\" --body-file pr-body.md · git switch main")
+        return 3
+    print(f"needs_approval — PR 을 열었습니다: {url.splitlines()[-1]}")
+    return 3
+
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv[1]))

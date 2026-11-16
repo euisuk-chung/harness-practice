@@ -55,7 +55,7 @@ def wait(base: str, pred, what: str, limit: float = 60):
 def main() -> int:
     with tempfile.TemporaryDirectory(prefix="minutes-app-") as t:
         root = Path(t) / "minutes"
-        shutil.copytree(SRC, root, ignore=shutil.ignore_patterns("requests", "minutes", "inbox", "__pycache__", "watch.log"),
+        shutil.copytree(SRC, root, ignore=shutil.ignore_patterns("requests", "minutes", "inbox", "__pycache__", "jobs", ".profile", ".venv", "watch.log"),
                         symlinks=True)
         fakebin = Path(t) / "fakebin"
         fakebin.mkdir()
