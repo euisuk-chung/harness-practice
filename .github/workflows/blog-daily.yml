@@ -6,7 +6,7 @@ name: blog-daily
 
 on:
   schedule:
-    - cron: "0 22 * * *"        # 분 시 일 월 요일 — 매일 UTC 22:00 = 한국 다음 날 07:00
+    - cron: "3,13,23,33,43,53 * * * *"   # 시험: 10분마다(확인 뒤 0 22 로 되돌린다)
   workflow_dispatch:             # Actions 화면의 Run workflow 버튼이나 gh workflow run 으로 손으로 실행
 
 concurrency:
