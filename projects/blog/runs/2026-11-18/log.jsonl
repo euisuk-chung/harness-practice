@@ -1,0 +1,5 @@
+{"t": "run", "at": "2026-11-18T12:20:50+09:00", "run_id": "2026-11-18", "trigger": "schedule"}
+{"t": "hook", "at": "2026-11-18T12:21:33+09:00", "step": "collect", "tool": "Write", "path": "runs/2026-11-18/sources/s1.md", "decision": "allow"}
+{"t": "hook", "at": "2026-11-18T12:21:35+09:00", "step": "collect", "tool": "Write", "path": "runs/2026-11-18/sources/s2.md", "decision": "allow"}
+{"t": "hook", "at": "2026-11-18T12:21:36+09:00", "step": "collect", "tool": "Write", "path": "runs/2026-11-18/sources/s3.md", "decision": "allow"}
+{"t": "hook", "at": "2026-11-18T12:21:37+09:00", "step": "collect", "tool": "Write", "path": "runs/2026-11-18/sources/s4.md", "decision": "allow"}
