@@ -3,3 +3,9 @@
 {"t": "hook", "at": "2026-11-18T12:21:35+09:00", "step": "collect", "tool": "Write", "path": "runs/2026-11-18/sources/s2.md", "decision": "allow"}
 {"t": "hook", "at": "2026-11-18T12:21:36+09:00", "step": "collect", "tool": "Write", "path": "runs/2026-11-18/sources/s3.md", "decision": "allow"}
 {"t": "hook", "at": "2026-11-18T12:21:37+09:00", "step": "collect", "tool": "Write", "path": "runs/2026-11-18/sources/s4.md", "decision": "allow"}
+{"t": "step", "at": "2026-11-18T12:20:50+09:00", "step": "collect", "attempt": 1, "result": "ok"}
+{"t": "step", "at": "2026-11-18T12:21:43+09:00", "step": "count", "attempt": 1, "result": "ok", "exit": 0}
+{"t": "step", "at": "2026-11-18T12:21:43+09:00", "step": "write", "attempt": 1, "result": "ok"}
+{"t": "step", "at": "2026-11-18T12:22:01+09:00", "step": "check", "attempt": 1, "result": "ok", "exit": 0}
+{"t": "step", "at": "2026-11-18T12:22:01+09:00", "step": "approve", "attempt": 1, "result": "human", "exit": 3, "why": "needs_approval — PR 을 열었습니다: https://github.com/euisuk-chung/harness-practice/pull/5"}
+{"t": "end", "at": "2026-11-18T12:22:05+09:00", "runner_exit": 3, "status": "human"}
